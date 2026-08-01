@@ -50,7 +50,7 @@ export async function createTask(
   try {
     const parsed = taskCreateSchema.safeParse(input);
     if (!parsed.success) {
-      return { ok: false, message: parsed.error.issues[0]?.message };
+      return { ok: false, message: parsed.error.issues[0]?.message ?? "Invalid input" };
     }
     const userId = await requireUserId();
 
@@ -75,8 +75,9 @@ export async function createTask(
     revalidatePath("/");
     return { ok: true, data: task };
   } catch (error) {
-    console.error("[createTask]", error);
-    return { ok: false, message: "Failed to create task" };
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    console.error("[createTask]", msg, error);
+    return { ok: false, message: `Failed to create task: ${msg}` };
   }
 }
 
