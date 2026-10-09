@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
-  title: "Sign in · God Watch",
+  title: "Sign in",
   description: "Sign in to God Watch with your Google account.",
 };
 

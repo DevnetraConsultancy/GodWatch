@@ -12,11 +12,12 @@ import { cn } from "@/lib/utils";
 
 /** Live status-cell showcase used in the left brand panel. */
 function CellShowcase() {
-  const rows = [
-    { label: "Deep Work", state: "done" as const },
-    { label: "Workout", state: "done" as const },
-    { label: "Read 20 pages", state: "missed" as const },
-    { label: "Meditate", state: "failed" as const },
+  // Each habit shows its last two days plus today (pending).
+  const rows: { label: string; history: ("done" | "missed" | "failed")[] }[] = [
+    { label: "Deep Work", history: ["done", "done"] },
+    { label: "Workout", history: ["done", "failed"] },
+    { label: "Read 20 pages", history: ["missed", "done"] },
+    { label: "Meditate", history: ["failed", "done"] },
   ];
 
   const styles = {
@@ -49,22 +50,17 @@ function CellShowcase() {
             <span className="min-w-0 flex-1 truncate text-xs font-medium text-muted-foreground">
               {r.label}
             </span>
-            <span
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-lg",
-                styles[r.state].cls
-              )}
-            >
-              {styles[r.state].icon}
-            </span>
-            <span
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-lg",
-                styles[r.state].cls
-              )}
-            >
-              {styles[r.state].icon}
-            </span>
+            {r.history.map((state, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-lg",
+                  styles[state].cls
+                )}
+              >
+                {styles[state].icon}
+              </span>
+            ))}
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-muted-foreground">
               <span className="text-xs">·</span>
             </span>

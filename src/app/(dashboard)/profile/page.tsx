@@ -10,7 +10,7 @@ import {
 } from "@/lib/queries";
 
 export const metadata: Metadata = {
-  title: "Profile · God Watch",
+  title: "Profile",
   description: "Your profile, stats, and achievements.",
 };
 

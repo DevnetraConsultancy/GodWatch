@@ -7,7 +7,7 @@ import { rangeISODates } from "@/lib/utils";
 import { buildExportRows } from "@/lib/export-helpers";
 
 export const metadata: Metadata = {
-  title: "Settings · God Watch",
+  title: "Settings",
   description: "Manage your God Watch preferences and data.",
 };
 

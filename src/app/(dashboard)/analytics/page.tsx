@@ -11,7 +11,7 @@ import {
 } from "@/lib/queries";
 
 export const metadata: Metadata = {
-  title: "Analytics · God Watch",
+  title: "Analytics",
   description: "Your habit analytics, streaks, and performance.",
 };
 
