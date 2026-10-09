@@ -34,6 +34,8 @@ export const authConfig = {
   pages: {
     signIn: "/login",
   },
+  // Vercel serves behind a proxy; also covered by AUTH_TRUST_HOST env var.
+  trustHost: true,
   callbacks: {
     async jwt({ token, user }) {
       // Persist the user id into the JWT for easy access in server code.
@@ -48,18 +50,10 @@ export const authConfig = {
       }
       return session;
     },
-    async authorized({ auth, request }) {
-      const isLoggedIn = !!auth?.user;
-      const { pathname } = request.nextUrl;
-      const isProtected =
-        pathname !== "/login" && !pathname.startsWith("/api/auth");
-      // Allow access to public assets & auth endpoints.
-      if (!isProtected) return true;
-      if (!isLoggedIn) {
-        return false;
-      }
-      return true;
-    },
+    // NOTE: route protection lives in src/middleware.ts (custom callback
+    // preserves callbackUrl). Do NOT add an `authorized` callback here —
+    // with a custom middleware function its boolean result is ignored,
+    // and it would block the public landing page if ever consulted alone.
   },
 } satisfies NextAuthConfig;
 

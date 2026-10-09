@@ -19,7 +19,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
-    error: "/login?error=OAuthError",
+    // Auth.js appends "?error=<type>" itself — embedding a query here
+    // produced malformed URLs like /login?error=OAuthError?error=X.
+    error: "/login",
   },
   providers: [
     Google({
