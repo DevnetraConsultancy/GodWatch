@@ -5,25 +5,22 @@ import { ACHIEVEMENT_DEFINITIONS } from "../src/lib/achievements";
 const prisma = new PrismaClient();
 
 /**
- * Seed script:
- *  - Seeds inspirational quotes
- *  - Seeds achievement badge definitions
+ * Seed the database with:
+ *  - Inspirational quotes (shown on month separators & dashboard)
+ *  - Achievement badge definitions
  */
 async function main() {
-  console.log("🌱 Seeding God Watch database...");
-
-  // Quotes — idempotent seeding by checking count.
-  const existingQuotes = await prisma.quote.count();
-  if (existingQuotes === 0) {
-    for (const q of QUOTES) {
-      await prisma.quote.create({ data: { text: q.text, author: q.author } });
-    }
-    console.log(`  ✅ Seeded ${QUOTES.length} quotes`);
-  } else {
-    console.log(`  ⏭  Quotes already seeded (${existingQuotes})`);
+  // Upsert quotes
+  for (const q of QUOTES) {
+    await prisma.quote.upsert({
+      where: { id: `quote-${q.text.slice(0, 40)}` },
+      update: { text: q.text, author: q.author },
+      create: { id: `quote-${q.text.slice(0, 40)}`, text: q.text, author: q.author },
+    });
   }
+  console.log(`✓ Seeded ${QUOTES.length} quotes`);
 
-  // Achievements — idempotent by key.
+  // Upsert achievement definitions
   for (const a of ACHIEVEMENT_DEFINITIONS) {
     await prisma.achievement.upsert({
       where: { key: a.key },
@@ -42,9 +39,7 @@ async function main() {
       },
     });
   }
-  console.log(`  ✅ Seeded ${ACHIEVEMENT_DEFINITIONS.length} achievements`);
-
-  console.log("🎉 Seed complete.");
+  console.log(`✓ Seeded ${ACHIEVEMENT_DEFINITIONS.length} achievements`);
 }
 
 main()

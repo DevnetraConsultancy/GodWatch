@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
 import {
   MoreHorizontal,
   Pencil,
@@ -40,7 +39,6 @@ import {
   updateStatus,
   updateTask,
 } from "@/lib/actions";
-import { useTaskStore } from "@/store/task-store";
 
 const STATUS_ICON: Record<StatusValue, React.ReactNode> = {
   PENDING: <span className="text-xs text-muted-foreground">·</span>,
@@ -73,8 +71,6 @@ export function GridView({
   sessionUser,
   stats,
 }: GridViewProps) {
-  const store = useTaskStore();
-  const hydrated = React.useRef(false);
   const [tasks, setTasks] = React.useState<TaskDTO[]>(initialTasks);
   const [statuses, setStatuses] = React.useState(initialStatuses);
   const [newTaskName, setNewTaskName] = React.useState("");
@@ -417,7 +413,7 @@ export function GridView({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete task?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete "{tasks.find((t) => t.id === deleteConfirm)?.name}" and all its data.
+              This will permanently delete “{tasks.find((t) => t.id === deleteConfirm)?.name}” and all its data.
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

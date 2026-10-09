@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { SettingsView } from "@/components/settings/settings-view";
-import { getTasks, getStatuses, getUserSettings } from "@/lib/queries";
+import { getTasks, getStatuses, getUserSettings, resolveSessionUserId } from "@/lib/queries";
 import { rangeISODates } from "@/lib/utils";
 import { buildExportRows } from "@/lib/export-helpers";
 
@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function SettingsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  const userId = (session.user as { id: string }).id;
+  const userId = await resolveSessionUserId(session);
 
   const [settings, tasks, statuses] = await Promise.all([
     getUserSettings(userId),

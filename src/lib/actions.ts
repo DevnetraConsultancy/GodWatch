@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { logActivity } from "@/lib/activity";
+import { requireUserId } from "@/lib/queries";
 import {
   noteUpdateSchema,
   settingsUpdateSchema,
@@ -22,20 +22,6 @@ import type { Status } from "@prisma/client";
  *   - Scope all queries to the session user (isolation)
  *   - Revalidate the dashboard cache
  */
-
-/**
- * Get the authenticated user's ID.
- * Accepts any non-empty user ID from the JWT session.
- * If the session is invalid or missing, throws "Unauthorized".
- */
-async function requireUserId(): Promise<string> {
-  const session = await auth();
-  const userId = (session?.user as { id?: string } | undefined)?.id;
-  if (!userId || typeof userId !== "string" || userId.length < 3) {
-    throw new Error("Unauthorized");
-  }
-  return userId;
-}
 
 export interface ActionResult {
   ok: boolean;

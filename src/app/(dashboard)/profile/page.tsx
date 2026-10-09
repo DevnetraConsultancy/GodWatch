@@ -6,6 +6,7 @@ import {
   getRecentActivity,
   getUserAchievements,
   getUserStats,
+  resolveSessionUserId,
 } from "@/lib/queries";
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export const dynamic = "force-dynamic";
 export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  const userId = (session.user as { id: string }).id;
+  const userId = await resolveSessionUserId(session);
 
   const [stats, achievements, recentActivity] = await Promise.all([
     getUserStats(userId),

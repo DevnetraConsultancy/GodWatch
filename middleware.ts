@@ -1,19 +1,48 @@
-import NextAuth from "next-auth";
-import { authConfig } from "@/lib/auth";
+import { auth } from "@/auth";
+import { NextResponse } from "next/server";
 
 /**
  * Route protection middleware.
- * Uses the `authorized` callback in authConfig to gate protected routes.
- * Public: /login, /api/auth/*, static assets.
- *
- * IMPORTANT: This builds a SEPARATE edge-safe NextAuth instance directly
- * from `authConfig` (which contains no Prisma import). We must NOT import
- * from `@/auth`, because that instance wires the PrismaAdapter (Node-only)
- * and would crash on the Edge Runtime.
+ * Uses the Auth.js v5 `auth` wrapper for edge-compatible session checks.
  */
-export const { auth: middleware } = NextAuth(authConfig);
+export default auth((req) => {
+  const isLoggedIn = !!req.auth?.user;
+  const { pathname } = req.nextUrl;
 
+  // Protect dashboard, analytics, profile, settings, and activity routes.
+  const protectedPaths = [
+    "/dashboard",
+    "/analytics",
+    "/profile",
+    "/settings",
+    "/activity",
+  ];
+
+  const isProtected = protectedPaths.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`)
+  );
+
+  if (isProtected && !isLoggedIn) {
+    const loginUrl = new URL("/login", req.nextUrl.origin);
+    // Preserve intended destination for post-login redirect.
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
+});
+
+// Match all routes except static assets and api/auth.
 export const config = {
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|manifest.webmanifest|icons/|offline).*)"],
+  matcher: [
+    /*
+     * Run middleware on:
+     *  - all page routes
+     *  - api routes (excluding /api/auth which is handled by NextAuth)
+     * Skip:
+     *  - static files (_next, images, favicon, icons, manifest, sw)
+     */
+    "/((?!_next/static|_next/image|favicon.ico|icons/|manifest.webmanifest|sw.js|api/auth).*)",
+  ],
 };
 

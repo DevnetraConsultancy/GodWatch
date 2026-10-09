@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { computeStreaks } from "@/lib/streak";
 import { percent } from "@/lib/utils";
+import { auth } from "@/auth";
+import type { Session } from "next-auth";
 import type {
   ActivityDTO,
   AnalyticsStats,
@@ -11,6 +13,52 @@ import type {
   TaskPerformance,
   UserStats,
 } from "@/types";
+
+/** Prisma CUID format: "c" followed by 24 lowercase alphanumeric chars. */
+const CUID_REGEX = /^c[a-z0-9]{24}$/;
+
+/**
+ * Resolve the authenticated user's DB row id from a session object.
+ *
+ * Handles two session shapes:
+ *  - Fresh sessions (after PrismaAdapter was wired): `token.id` is the real
+ *    DB CUID, used directly.
+ *  - Stale sessions (created before the adapter fix): `token.id` is the
+ *    Google `sub` (long numeric id) which has no matching User row. In that
+ *    case we fall back to looking the user up by email — this prevents the
+ *    P2003 foreign-key failure on every write.
+ */
+export async function resolveSessionUserId(
+  session: Session | null
+): Promise<string> {
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+  const email = session?.user?.email;
+
+  if (userId && typeof userId === "string" && CUID_REGEX.test(userId) && userId.length === 25) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+    if (user) return user.id;
+  }
+
+  // Fallback for stale sessions / missing DB id: resolve by email.
+  if (email && typeof email === "string") {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    if (user) return user.id;
+  }
+
+  throw new Error("Unauthorized");
+}
+
+/** Convenience wrapper that fetches the session and resolves the user id. */
+export async function requireUserId(): Promise<string> {
+  const session = await auth();
+  return resolveSessionUserId(session);
+}
 
 /**
  * Server-side data access layer.

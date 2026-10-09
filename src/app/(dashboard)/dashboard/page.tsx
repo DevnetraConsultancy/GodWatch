@@ -6,6 +6,7 @@ import {
   getStatuses,
   getTasks,
   getUserStats,
+  resolveSessionUserId,
 } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  const userId = (session.user as { id: string }).id;
+  const userId = await resolveSessionUserId(session);
 
   const [tasks, statuses, summary, stats] = await Promise.all([
     getTasks(userId),

@@ -1,30 +1,34 @@
 import { prisma } from "@/lib/prisma";
 import type { ActivityType } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 /**
- * Audit-trail helper.
- * Records every meaningful user action. Used across server actions and
- * API routes. Never throws — logging failures must not break UX.
+ * Activity logging helper.
+ * Every meaningful user action is recorded for the audit trail.
  */
-export async function logActivity(params: {
+
+export interface LogActivityInput {
   userId: string;
   type: ActivityType;
-  metadata?: Record<string, unknown>;
-  ip?: string | null;
-  userAgent?: string | null;
-}) {
+  metadata?: Prisma.InputJsonValue;
+}
+
+export async function logActivity({
+  userId,
+  type,
+  metadata,
+}: LogActivityInput): Promise<void> {
   try {
     await prisma.activityLog.create({
       data: {
-        userId: params.userId,
-        type: params.type,
-        metadata: (params.metadata ?? {}) as object,
-        ip: params.ip,
-        userAgent: params.userAgent,
+        userId,
+        type,
+        metadata: (metadata as Prisma.InputJsonValue) ?? Prisma.JsonNull,
       },
     });
   } catch (error) {
-    console.error("[activity] Failed to log activity:", error);
+    // Logging should never break the primary action.
+    console.error("[logActivity]", error);
   }
 }
 

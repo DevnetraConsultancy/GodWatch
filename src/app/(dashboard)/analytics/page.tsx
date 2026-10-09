@@ -7,6 +7,7 @@ import {
   getCompletionSeries,
   getHeatmap,
   getTaskPerformance,
+  resolveSessionUserId,
 } from "@/lib/queries";
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export const dynamic = "force-dynamic";
 export default async function AnalyticsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  const userId = (session.user as { id: string }).id;
+  const userId = await resolveSessionUserId(session);
 
   const [analytics, series, heatmap, taskPerformance] = await Promise.all([
     getAnalytics(userId),

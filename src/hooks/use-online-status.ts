@@ -1,31 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
-import { useTaskStore } from "@/store/task-store";
+import { useOfflineStore } from "@/store/offline-store";
 
-/**
- * Tracks online/offline status and triggers the sync queue flush
- * when connectivity is restored.
- */
-export function useOnlineStatus(onReconnect?: () => void) {
-  const setOffline = useTaskStore((s) => s.setOffline);
+/** Track navigator online/offline state and reflect it in the offline store. */
+export function useOnlineStatus() {
+  const setIsOnline = useOfflineStore((s) => s.setIsOnline);
 
   useEffect(() => {
-    const handleOnline = () => {
-      setOffline(false);
-      onReconnect?.();
-    };
-    const handleOffline = () => setOffline(true);
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
-
-    setOffline(!navigator.onLine);
-
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [setOffline, onReconnect]);
+  }, [setIsOnline]);
 }
 
