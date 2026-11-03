@@ -43,7 +43,8 @@ export function LandingNav() {
 export function Hero() {
   return (
     <section className="container-page grid items-center gap-12 pb-16 pt-16 sm:pt-24 lg:grid-cols-[1fr_1.15fr] lg:pb-24">
-      <div className="animate-rise space-y-6">
+      {/* No entrance animation here: this text is the page's largest paint. */}
+      <div className="space-y-6">
         <p className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent-text">
           <ShieldCheck className="size-3.5" aria-hidden /> {APP_TAGLINE}
         </p>
