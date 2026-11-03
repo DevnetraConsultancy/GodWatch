@@ -39,3 +39,4 @@ yarn-error.log*
 # Local credentials and tool state (never commit)
 /creds/
 /.freebuff/
+/playwright/.cache

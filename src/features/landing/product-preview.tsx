@@ -33,7 +33,7 @@ export function ProductPreview({ className }: { className?: string }) {
           <Flame className="size-3.5" aria-hidden /> Example: 12-day streak
         </span>
       </div>
-      <div className="scrollbar-thin overflow-x-auto">
+      <div className="scrollbar-thin overflow-x-auto" tabIndex={0} role="region" aria-label="Example grid, scrolls sideways">
         <table className="w-full min-w-[520px] border-separate border-spacing-1 p-2 text-left">
           <thead>
             <tr>

@@ -120,12 +120,13 @@ export function GridView(props: GridViewProps) {
 
       const taskName = tasksRef.current.find((t) => t.id === taskId)?.name ?? "Habit";
       if (mode === "undo") {
-        toast("Change undone", { id: STATUS_TOAST_ID, description: `${taskName} is back to ${STATUS_LABELS[to].toLowerCase()}.` });
+        toast("Change undone", { id: `${STATUS_TOAST_ID}-undo`, description: `${taskName} is back to ${STATUS_LABELS[to].toLowerCase()}.` });
       } else {
         toast(`${taskName}: ${STATUS_LABELS[to]}`, {
           id: STATUS_TOAST_ID,
           description: `${formatDate(date, { weekday: "short", month: "short", day: "numeric" })}. ${STATUS_MESSAGES[to]}`,
           action: { label: "Undo", onClick: () => void undo() },
+          duration: 8000,
         });
       }
       for (const badge of res.data.unlocked) {
@@ -415,7 +416,7 @@ export function GridView(props: GridViewProps) {
               role="grid"
               aria-label="Habits by day. Rows are days, newest first; columns are habits."
               aria-rowcount={days.length + 1}
-              className="w-max min-w-full border-separate border-spacing-0"
+              className="w-max border-separate border-spacing-0"
               onKeyDown={onGridKeyDown}
             >
               <thead>

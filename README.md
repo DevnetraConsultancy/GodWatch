@@ -1,300 +1,90 @@
-# 🛡️ God Watch — Every Day Leaves Evidence
+# God Watch
 
-A habit tracker and daily checklist organized by date, not by task. Built with Next.js 15, React 19, TypeScript, Tailwind CSS, PostgreSQL, and Auth.js.
+**Every Day Leaves Evidence.** A date-first habit tracker: each day is a row, each habit a column, and every cell is Pending, Completed, Failed or Missed.
 
-![License: MIT](https://img.shields.io/badge/license-MIT-blue)
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+Built with Next.js 15 (App Router), React 19, TypeScript (strict), Tailwind CSS 4, Prisma with Neon Postgres, and Auth.js v5 (Google sign-in only).
 
----
+## Features
 
-## ✨ Features
+- **Grid**: today on top, 90 days by default with "Show earlier days". One click cycles a cell and saves instantly, with an Undo toast and Ctrl+Z.
+- **Keyboard**: arrow keys move between cells, `1` `2` `3` `0` set a status, `Enter` cycles, `N` opens the day's note, `Ctrl+K` searches, `?` shows all shortcuts.
+- **Habits**: add, rename, recolour, reorder (drag or menu), archive and restore, delete with confirmation.
+- **Notes**: one autosaving note per day, searchable.
+- **Analytics**: today / 7 / 30 / 365-day rates, current and longest streak, best and toughest month, 30-day trend, year heatmap, per-habit breakdown.
+- **Badges**: unlocked automatically and kept once earned.
+- **Reminders**: optional browser notification at a chosen time (works while the app is open or installed).
+- **Export**: last 365 days as CSV or PDF.
 
-### Core
-- **Date-first dashboard** — a grid with today on top, sticky dates and task headers, and earlier days on demand.
-- **Task management** — add, rename, delete, archive, reorder, and color-code unlimited tasks.
-- **Status cell engine** — each cell cycles through Pending → Completed → Failed → Missed with a confirmation dialog.
-- **Month separators** — month labels between the rows of the grid.
-- **Notes** — autosave notes per date.
+### How days and streaks are counted ("fair history")
 
-### Analytics
-- **Dashboard summary** — daily completion %, current streak, motivational quote.
-- **Full analytics** — daily, weekly, monthly, yearly completion rates.
-- **Streaks** — current streak + longest streak calculation.
-- **Heatmap calendar** — GitHub-style activity heatmap.
-- **Charts** — pie charts (status distribution) + bar charts (task-wise performance).
-- **Best/worst month** — automatically computed.
-- **Profile page** — lifetime stats, recent activity feed, achievement badges.
+- "Today" is the user's own day in their timezone, detected from the browser and stored in Settings.
+- A habit counts from the day it was created (or the earliest day you back-filled for it) until the day it was archived.
+- A day is *perfect* when it has at least one active habit and every active habit is Completed. Streaks count consecutive perfect days; an unfinished today never breaks the current streak.
+- Adding a habit never changes how past days score.
 
-### Data & Security
-- **Google OAuth only** — SSO via Auth.js v5.
-- **User isolation** — every user sees only their own data.
-- **Activity log** — full audit trail of all user actions.
-- **Rate limiting** — per user on every server action; in-memory, so per instance on serverless (drop-in Redis/Upstash for a global limit).
-- **Zod validation** — shared schemas between client and server.
-- **CSRF, XSS, SQL injection** — Server Action origin checks, a nonce-based Content Security Policy, and Prisma parameterized queries.
+The engine is pure and unit-tested: `src/lib/stats.ts`, `src/lib/dates.ts`.
 
-### Quality of Life
-- **Keyboard shortcuts** — `1` (Completed), `2` (Failed), `3` (Missed), `0` (Pending), `Cmd+K` (Search), `Cmd+Z` (Undo).
-- **Drag & drop** — reorder tasks via drag-and-drop.
-- **Undo** — Zustand-powered undo stack for the last action.
-- **Encouraging toasts** — Sonner toasts react to every status change.
-- **Dark/light/system theme** — next-themes powered.
-- **PWA** — installable; status changes made offline are queued on the device and sync on reconnect. Signed-in pages are never cached.
-- **Daily reminders** — browser notifications at configurable time.
-- **Global search** — search task names, notes, and dates.
-- **Export CSV/PDF** — download your data.
-
-### Accessibility
-- WCAG AA contrast ratios.
-- `aria-pressed`, `role="grid"`, focus rings.
-- Reduced-motion respect.
-- Screen reader friendly.
-
----
-
-## 🏗️ Architecture
+## Project structure
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                   Next.js 15 App Router                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐  │
-│  │  RSC      │  │  Client  │  │  API Route Handlers  │  │
-│  │ (Reads)   │  │ (Write)  │  │  + Server Actions    │  │
-│  └──────────┘  └──────────┘  └──────────────────────┘  │
-├─────────────────────────────────────────────────────────┤
-│                 Zustand (Optimistic UI)                 │
-├─────────────────────────────────────────────────────────┤
-│              Prisma ORM → Supabase PostgreSQL            │
-├─────────────────────────────────────────────────────────┤
-│                 Auth.js (Google OAuth)                   │
-└─────────────────────────────────────────────────────────┘
+src/
+  app/            routes: landing, (auth)/login, (app)/dashboard|analytics|profile|settings, api/
+  components/ui/  design system (buttons, fields, cards, dialogs, menus, tabs, tooltips, tables, states)
+  features/       grid, analytics, profile, settings, search, shell, reminders, landing, pwa
+  server/         auth, database, session, rate limiting, data access, server actions (server-only)
+  lib/            pure logic: dates, stats, status, achievements, export, validation
+prisma/           schema, migrations, seed, one-off Supabase copy script
+tests/unit        Vitest
+tests/e2e         Playwright (runs against a throwaway in-memory Postgres)
 ```
 
-### Key Decisions
-
-| Decision | Rationale |
-|---|---|
-| **RSC for reads, actions for writes** | Smaller client bundle, faster LCP, built-in cache revalidation. |
-| **`TaskStatus(taskId, date)` composite unique** | Fully normalized row-per-cell; trivial analytics aggregation. |
-| **Local component state + localStorage queue** | Optimistic updates with rollback, offline status queue, undo stack. |
-| **JWT session strategy** | Zero DB lookups on hot paths; edge-deployable. |
-| **Calendar `date` stored as a yyyy-MM-dd string** | A cell belongs to the user's own day. The browser's timezone reaches the server in a validated cookie, so server and client agree on "today". |
-| **Zod as single validation source** | Shared across client and server; eliminates drift. |
-
----
-
-## 📁 Project Structure
-
-```
-god-watch/
-├── prisma/                    # Schema, migrations, seed
-│   ├── schema.prisma          # Full DB schema (10 models)
-│   └── seed.ts                # Quotes + achievements seed
-├── public/                    # Static assets
-│   ├── manifest.webmanifest   # PWA manifest
-│   └── sw.js                  # Service worker (offline)
-├── src/
-│   ├── app/                   # Next.js App Router
-│   │   ├── (auth)/login/      # Login page
-│   │   ├── (dashboard)/       # Protected pages
-│   │   │   ├── dashboard/     # Main dashboard
-│   │   │   ├── analytics/     # Analytics + charts
-│   │   │   ├── profile/       # User profile
-│   │   │   └── settings/      # Settings + export
-│   │   ├── api/auth/          # Auth.js route handler
-│   │   ├── layout.tsx         # Root layout
-│   │   ├── page.tsx           # Landing page
-│   │   ├── loading.tsx        # Global loading skeleton
-│   │   └── error.tsx          # Error boundary
-│   ├── components/
-│   │   ├── ui/                # shadcn/ui primitives
-│   │   ├── auth/              # Login form
-│   │   ├── dashboard/         # Core dashboard components
-│   │   ├── analytics/         # Charts, heatmap, stat cards
-│   │   ├── profile/           # Profile view
-│   │   ├── settings/          # Settings view
-│   │   ├── navigation/        # TopNav, theme toggle, user menu
-│   │   ├── search/            # Global search dialog
-│   │   ├── shared/            # Footer, icons, PWA client
-│   │   └── providers/         # Theme, session, toast providers
-│   ├── hooks/                 # Custom React hooks
-│   ├── lib/                   # Core business logic
-│   ├── store/                 # Zustand stores
-│   ├── types/                 # Shared TypeScript types
-│   └── styles/                # Global CSS tokens
-├── tests/                     # Test suites
-│   ├── unit/                  # Vitest unit tests
-│   ├── e2e/                   # Playwright E2E tests
-│   └── setup.ts              # Test setup
-├── middleware.ts              # Auth route protection
-├── next.config.ts             # Security headers, image config
-├── tailwind.config.ts         # Design tokens
-├── vitest.config.ts           # Unit test configuration
-├── playwright.config.ts       # E2E test configuration
-├── vercel.json                # Vercel deployment config
-└── README.md                  # You are here
-```
-
----
-
-## 🗄️ Database Schema
-
-| Model | Purpose |
-|---|---|
-| **User** | Auth.js user (name, email, image) |
-| **Account** | Auth.js OAuth accounts |
-| **Session** | Auth.js sessions |
-| **VerificationToken** | Auth.js email verification |
-| **Task** | User-defined habits (name, color, order, archived) |
-| **TaskStatus** | Cell status (PENDING/COMPLETED/FAILED/MISSED) per task+date |
-| **Note** | Autosaved notes per date |
-| **ActivityLog** | Full audit trail |
-| **Quote** | Inspirational quotes |
-| **Achievement** | Badge definitions |
-| **UserAchievement** | User-badge join |
-| **Settings** | Per-user preferences |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+
-- A [Supabase](https://supabase.com) project (free tier works)
-- A [Google Cloud Console](https://console.cloud.google.com) OAuth 2.0 Client ID + Secret
-
-### 1. Clone & Install
+## Getting started
 
 ```bash
-git clone <repo-url>
-cd god-watch
 npm install
-```
-
-### 2. Environment Variables
-
-Copy `.env.example` to `.env` and fill in:
-
-```bash
-cp .env.example .env
-```
-
-| Variable | Description |
-|---|---|
-| `AUTH_SECRET` | Run `openssl rand -hex 32` to generate |
-| `GOOGLE_CLIENT_ID` | From GCP Console |
-| `GOOGLE_CLIENT_SECRET` | From GCP Console |
-| `DATABASE_URL` | Supabase pooled connection string (`:6543`) |
-| `DIRECT_URL` | Supabase direct connection string (`:5432`) |
-| `NEXT_PUBLIC_APP_URL` | Your deployed URL (or `http://localhost:3000`) |
-
-**Google OAuth authorized redirect URI:**
-`{NEXT_PUBLIC_APP_URL}/api/auth/callback/google`
-
-### 3. Database Setup
-
-```bash
-# Push schema directly (first-time setup)
-npx prisma db push
-
-# Or create a migration
-npx prisma migrate dev --name init
-
-# Seed quotes and achievements
-npx prisma db seed
-```
-
-### 4. Run Development Server
-
-```bash
+cp .env.example .env        # fill in the values
+npx prisma migrate deploy   # create tables
+npm run db:seed             # badge definitions
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) and sign in with Google.
+## Scripts
 
----
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` | Prisma generate + production build |
+| `npm run typecheck` | TypeScript, strict |
+| `npm run lint` | ESLint, zero warnings allowed |
+| `npm test` | Unit tests |
+| `npm run test:e2e` | End-to-end tests (starts its own app and database) |
+| `npm run check` | Type check, lint, unit tests and build |
+| `npm run db:migrate` | Create a new migration in development |
+| `npm run db:deploy` | Apply migrations (production) |
+| `npm run db:copy-legacy` | One-off copy from the old Supabase database |
 
-## 🧪 Testing
+Set `E2E_PROD=1` to run the e2e suite against `next start` (run `npm run build` first).
 
-```bash
-# Unit tests
-npm run test
+## Security
 
-# Unit tests (watch mode)
-npm run test:watch
+- Google sign-in only, verified emails only. Sessions are JWTs; every request re-checks the user exists in the database.
+- Every query is scoped to the signed-in user's id from the session, never from client input.
+- All inputs are validated with Zod on the server (and on the client for fast feedback).
+- Rate limits on every server action, sign-in and export, stored in Postgres so they hold across serverless instances.
+- Per-request nonce Content-Security-Policy, plus HSTS, frame, content-type, referrer and permissions headers.
+- Server Actions enforce same-origin requests (CSRF). Post-login redirects accept same-origin paths only.
+- CSV export neutralises spreadsheet formulas.
+- The service worker caches public static files only; signed-in pages and API responses are never cached.
 
-# E2E tests (requires running app + Google OAuth configured)
-npm run test:e2e
+## Deployment (Vercel + Neon)
 
-# TypeScript type check
-npm run typecheck
+1. Create a Neon project; copy the pooled and direct connection strings.
+2. Set the environment variables from `.env.example` in Vercel.
+3. Vercel runs `prisma migrate deploy && npm run build` (see `vercel.json`).
+4. Add `{your domain}/api/auth/callback/google` as an authorised redirect URI in Google Cloud Console.
 
-# Lint
-npm run lint
-```
+## Author
 
----
+**Devnetra Consultancy** · [dr.neeconnect@gmail.com](mailto:dr.neeconnect@gmail.com)
 
-## 🌐 Deployment (Vercel)
-
-1. Push to GitHub.
-2. Import the repo into Vercel.
-3. Set all environment variables (see `.env.example`) in Vercel's project settings.
-4. Set `DATABASE_URL` to Supabase pooled connection.
-5. Add `DIRECT_URL` for Prisma migrations.
-6. Deploy — Vercel automatically runs `npm run build` (which calls `prisma generate` then `next build`).
-7. Update your Google OAuth redirect URI to point to your production URL.
-
----
-
-## 🎨 Design System
-
-God Watch uses a neutral zinc-based palette with semantic status colors.
-
-| Token | Light | Dark |
-|---|---|---|
-| `--background` | `0 0% 100%` | `240 10% 3.9%` |
-| `--foreground` | `240 10% 3.9%` | `0 0% 98%` |
-| `--primary` | `240 5.9% 10%` | `0 0% 98%` |
-| `--success` | `142 76% 36%` | `142 69% 48%` |
-| `--danger` | `0 72% 51%` | `0 72% 55%` |
-| `--warning` | `24 95% 53%` | `30 92% 56%` |
-| `--radius` | `0.75rem` | `0.75rem` |
-
-Typography uses Geist (Geist Sans + Geist Mono) for a clean, modern look.
-
----
-
-## 🔒 Security
-
-- **Google OAuth only** — no password storage; verified Google emails only; Google's tokens aren't stored.
-- **Isolation by userId** — every query is scoped to the signed-in user, including writes.
-- **CSRF protection** — Next.js Server Actions enforce `Origin` header checks.
-- **XSS prevention** — React's escaping + a per-request nonce Content Security Policy (`src/middleware.ts`).
-- **SQL injection prevention** — Prisma uses parameterized queries.
-- **Input validation** — Zod schemas on every server action, including ids.
-- **Rate limiting** — per user, per action type. In-memory: see the note in `src/lib/rate-limit.ts`.
-- **Open redirect prevention** — post-login redirects accept same-origin paths only.
-- **No sensitive caching** — the service worker stores only public static files.
-- **CSV injection prevention** — exported cells that start with a formula character are neutralized.
-- **Secure cookies** — `httpOnly`, `sameSite`, `secure` flags (Auth.js defaults).
-
----
-
-## 📄 License
-
-MIT — see LICENSE file.
-
----
-
-## 👨‍💻 Author
-
-**Devnetra Consultancy**  
-Email: [dr.neeconnect@gmail.com](mailto:dr.neeconnect@gmail.com)
-
----
-
-> *"Every day leaves evidence." — God Watch*
-
+Invented by Devnetra Consultancy.

@@ -92,7 +92,7 @@ export function AnalyticsView({ stats, trend, heatmap, performance }: Props) {
         <Highlight
           icon={TrendingDown}
           label="Toughest month"
-          value={stats.worstMonth ? `${formatMonth(stats.worstMonth.month, { month: "short", year: "numeric" })}, ${stats.worstMonth.rate}%` : "Not enough data"}
+          value={stats.worstMonth && stats.worstMonth.month !== stats.bestMonth?.month ? `${formatMonth(stats.worstMonth.month, { month: "short", year: "numeric" })}, ${stats.worstMonth.rate}%` : "Not enough data"}
         />
       </div>
 
@@ -152,7 +152,7 @@ export function AnalyticsView({ stats, trend, heatmap, performance }: Props) {
           </CardHeader>
           <CardContent className="grid gap-6 lg:grid-cols-2">
             <HabitBars data={performance} />
-            <Table>
+            <Table label="Habit performance">
               <THead>
                 <TR>
                   <TH>Habit</TH>

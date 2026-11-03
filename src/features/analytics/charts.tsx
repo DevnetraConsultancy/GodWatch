@@ -30,9 +30,11 @@ const tooltipStyle = {
 } as const;
 
 export function TrendChart({ data }: { data: { date: string; rate: number; completed: number; active: number }[] }) {
+  // Days with no active habit are gaps, not 0%.
+  const points = data.map((d) => ({ date: d.date, rate: d.active > 0 ? d.rate : null }));
   return (
     <ResponsiveContainer width="100%" height={240}>
-      <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+      <AreaChart data={points} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.35} />
@@ -41,7 +43,7 @@ export function TrendChart({ data }: { data: { date: string; rate: number; compl
         </defs>
         <CartesianGrid stroke="var(--line)" vertical={false} />
         <XAxis dataKey="date" {...axis} tickFormatter={(d: string) => formatDate(d)} minTickGap={24} />
-        <YAxis {...axis} domain={[0, 100]} tickFormatter={(v: number) => `${v}%`} width={48} />
+        <YAxis {...axis} domain={[0, 100]} tickFormatter={(v: number) => `${v}%`} width={44} />
         <Tooltip
           {...tooltipStyle}
           labelFormatter={(d: string) => formatDate(d, { weekday: "short", month: "short", day: "numeric" })}

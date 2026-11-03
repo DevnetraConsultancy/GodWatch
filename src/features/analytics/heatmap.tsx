@@ -36,7 +36,7 @@ export function Heatmap({ days }: { days: Day[] }) {
 
   return (
     <figure className="space-y-3">
-      <div className="scrollbar-thin overflow-x-auto pb-2">
+      <div className="scrollbar-thin overflow-x-auto pb-2" tabIndex={0} role="region" aria-label="Heatmap, scrolls sideways">
         <div className="flex w-max gap-[3px]" role="img" aria-label="Completion heatmap for the last year. Details are in the tables on this page.">
           {weeks.map((week, w) => (
             <div key={w} className="grid grid-rows-7 gap-[3px]">

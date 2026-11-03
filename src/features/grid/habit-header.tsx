@@ -67,7 +67,7 @@ export function HabitHeader({
       onDragOver={(e) => e.preventDefault()}
       onDragEnd={onDragEnd}
       className={cn(
-        "sticky top-0 z-20 min-w-28 max-w-40 bg-glass-strong p-1 align-bottom backdrop-blur-xl transition-opacity",
+        "sticky top-0 z-20 w-32 min-w-28 max-w-40 bg-glass-strong p-1 align-bottom backdrop-blur-xl transition-opacity",
         dragging && "opacity-40"
       )}
     >

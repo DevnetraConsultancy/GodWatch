@@ -36,16 +36,16 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
 
   return (
     <main id="main" className="grid min-h-dvh lg:grid-cols-2">
-      <section className="relative hidden flex-col justify-between overflow-hidden p-10 lg:flex" aria-hidden>
+      <section className="relative hidden flex-col justify-between overflow-hidden p-10 lg:flex">
         <BrandLink />
         <div className="space-y-6">
-          <h2 className="max-w-md text-4xl font-semibold leading-tight tracking-tight">
+          <p className="max-w-md text-4xl font-semibold leading-tight tracking-tight">
             Proof beats <span className="text-gradient">motivation.</span>
-          </h2>
+          </p>
           <p className="max-w-md text-fg-muted">
             Mark each day Completed, Failed or Missed, and let streaks, heatmaps and analytics show your consistency.
           </p>
-          <div className="glass w-full max-w-xs space-y-2 rounded-lg p-4">
+          <div className="glass w-full max-w-xs space-y-2 rounded-lg p-4" aria-hidden>
             {[
               { name: "Deep work", marks: ["done", "done"] },
               { name: "Workout", marks: ["done", "failed"] },

@@ -1,9 +1,13 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export function Table({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) {
+export function Table({
+  className,
+  label = "Table",
+  ...props
+}: React.TableHTMLAttributes<HTMLTableElement> & { label?: string }) {
   return (
-    <div className="scrollbar-thin w-full overflow-x-auto">
+    <div className="scrollbar-thin w-full overflow-x-auto" tabIndex={0} role="region" aria-label={label}>
       <table className={cn("w-full caption-bottom border-collapse text-sm", className)} {...props} />
     </div>
   );
