@@ -1,44 +1,47 @@
 import { describe, expect, it } from "vitest";
 import {
-  isoDateSchema,
   noteUpdateSchema,
+  settingsUpdateSchema,
   statusUpdateSchema,
   taskCreateSchema,
   taskUpdateSchema,
+  timeZoneSchema,
 } from "@/lib/validation";
 
-describe("validation schemas", () => {
-  it("accepts valid ISO dates", () => {
-    expect(isoDateSchema.safeParse("2024-01-05").success).toBe(true);
+describe("validation", () => {
+  it("validates habit names", () => {
+    expect(taskCreateSchema.safeParse({ name: " Reading " }).data?.name).toBe("Reading");
+    expect(taskCreateSchema.safeParse({ name: "   " }).success).toBe(false);
+    expect(taskCreateSchema.safeParse({ name: "x".repeat(101) }).success).toBe(false);
   });
 
-  it("rejects invalid ISO dates", () => {
-    expect(isoDateSchema.safeParse("2024-13-45").success).toBe(false);
-    expect(isoDateSchema.safeParse("hello").success).toBe(false);
+  it("only allows palette colours", () => {
+    expect(taskCreateSchema.safeParse({ name: "A", color: "#6366f1" }).success).toBe(true);
+    expect(taskCreateSchema.safeParse({ name: "A", color: "#123456" }).success).toBe(false);
   });
 
-  it("validates task creation", () => {
-    expect(taskCreateSchema.safeParse({ name: "Reading" }).success).toBe(true);
-    expect(taskCreateSchema.safeParse({ name: "" }).success).toBe(false);
-    expect(taskCreateSchema.safeParse({ name: "x".repeat(200) }).success).toBe(false);
+  it("requires at least one field on update", () => {
+    expect(taskUpdateSchema.safeParse({ taskId: "abc" }).success).toBe(false);
+    expect(taskUpdateSchema.safeParse({ taskId: "abc", archived: true }).success).toBe(true);
   });
 
-  it("validates task updates", () => {
-    expect(taskUpdateSchema.safeParse({ name: "Gym" }).success).toBe(true);
-    expect(taskUpdateSchema.safeParse({ color: "red" }).success).toBe(false);
-    expect(taskUpdateSchema.safeParse({ archived: true }).success).toBe(true);
+  it("rejects malformed ids, dates and statuses", () => {
+    const ok = { taskId: "cm1abc", date: "2025-03-10", status: "COMPLETED" };
+    expect(statusUpdateSchema.safeParse(ok).success).toBe(true);
+    expect(statusUpdateSchema.safeParse({ ...ok, taskId: "a' OR 1=1" }).success).toBe(false);
+    expect(statusUpdateSchema.safeParse({ ...ok, date: "2025-02-30" }).success).toBe(false);
+    expect(statusUpdateSchema.safeParse({ ...ok, status: "DONE" }).success).toBe(false);
   });
 
-it("validates status updates", () => {
-    const valid = { taskId: "clfnq7x1a0000kz5p8e1h3abc", date: "2024-01-05", status: "COMPLETED" };
-    expect(statusUpdateSchema.safeParse(valid).success).toBe(true);
-    expect(statusUpdateSchema.safeParse({ ...valid, status: "BOGUS" }).success).toBe(false);
-    expect(statusUpdateSchema.safeParse({ ...valid, date: "bad" }).success).toBe(false);
+  it("caps note length", () => {
+    expect(noteUpdateSchema.safeParse({ date: "2025-03-10", content: "x".repeat(10_001) }).success).toBe(false);
   });
 
-  it("validates note updates", () => {
-    expect(noteUpdateSchema.safeParse({ date: "2024-01-05", content: "hi" }).success).toBe(true);
-    expect(noteUpdateSchema.safeParse({ date: "bad", content: "hi" }).success).toBe(false);
+  it("validates settings and timezones", () => {
+    const ok = { dailyReminderEnabled: true, dailyReminderTime: "07:30", defaultTaskColor: "#10b981" };
+    expect(settingsUpdateSchema.safeParse(ok).success).toBe(true);
+    expect(settingsUpdateSchema.safeParse({ ...ok, dailyReminderTime: "25:00" }).success).toBe(false);
+    expect(timeZoneSchema.safeParse("Europe/London").success).toBe(true);
+    expect(timeZoneSchema.safeParse("Not/AZone").success).toBe(false);
   });
 });
-

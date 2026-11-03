@@ -1,5 +1,5 @@
 // ============================================================
-// God Watch — Prisma Schema (Supabase PostgreSQL)
+// God Watch — Prisma schema (Neon PostgreSQL)
 // ============================================================
 
 generator client {
@@ -78,20 +78,22 @@ model VerificationToken {
 
 /// A user-defined habit / checklist item.
 model Task {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  color     String   @default("#64748b")
-  order     Int      @default(0)
-  archived  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  color      String   @default("#6366f1")
+  order      Int      @default(0)
+  /// First day the habit counts, in the user's timezone (yyyy-MM-dd).
+  startDate  String
+  /// Day the habit was archived (yyyy-MM-dd); it stops counting from this day. Null while active.
+  archivedOn String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   taskStatuses TaskStatus[]
 
-  @@index([userId, archived, order])
-  @@index([userId, order])
+  @@index([userId, archivedOn, order])
 }
 
 enum Status {
@@ -102,11 +104,11 @@ enum Status {
 }
 
 /// One cell in the grid: status of a task on a particular date.
-/// `date` is normalized as yyyy-MM-dd (UTC) to avoid timezone drift.
+/// `date` is a calendar day in the user's timezone (yyyy-MM-dd).
 model TaskStatus {
   id        String   @id @default(cuid())
   taskId    String
-  date      String // normalized yyyy-MM-dd (UTC)
+  date      String
   status    Status   @default(PENDING)
   updatedAt DateTime @updatedAt
 
@@ -121,7 +123,7 @@ model TaskStatus {
 model Note {
   id        String   @id @default(cuid())
   userId    String
-  date      String // normalized yyyy-MM-dd
+  date      String
   content   String   @db.Text @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -164,13 +166,6 @@ model ActivityLog {
   @@index([createdAt])
 }
 
-/// Inspirational quotes shown on month separators & dashboard.
-model Quote {
-  id     String @id @default(cuid())
-  text   String @db.Text
-  author String
-}
-
 /// Badges / achievements definitions.
 model Achievement {
   id               String            @id @default(cuid())
@@ -200,16 +195,24 @@ model UserAchievement {
 
 /// Per-user preferences.
 model Settings {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  theme              String   @default("system") // light | dark | system
-  dailyReminderEnabled Boolean @default(false)
-  dailyReminderTime  String?  @default("20:00") // HH:mm local
-  dailyReminderChannel String @default("browser") // browser | email
-  defaultTaskColor   String   @default("#6366f1")
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  /// IANA timezone that defines the user's "today".
+  timeZone             String   @default("UTC")
+  dailyReminderEnabled Boolean  @default(false)
+  dailyReminderTime    String   @default("20:00") // HH:mm local
+  defaultTaskColor     String   @default("#6366f1")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+/// Fixed-window rate-limit counters, shared by every server instance.
+model RateLimit {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+
+  @@index([resetAt])
+}

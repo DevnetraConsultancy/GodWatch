@@ -1,53 +1,67 @@
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import { authConfig } from "@/lib/auth";
+import { authConfig } from "@/server/auth-config";
 
 /**
- * Route protection middleware (Edge runtime).
- *
- * IMPORTANT: uses the edge-safe authConfig from src/lib/auth.ts — NOT the
- * instance in src/auth.ts, which wires PrismaAdapter (Node-only) and would
- * crash the Edge runtime. Both instances share the same AUTH_SECRET and
- * session cookie, so req.auth.user here matches the server-side session.
- *
- * NOTE: Next.js only scans src/ for middleware when the app lives in
- * src/app — a root-level middleware.ts is silently ignored (that was the
- * bug that left this file dead). Keep this file at src/middleware.ts.
+ * Edge middleware: route protection plus a per-request nonce
+ * Content-Security-Policy. Uses the edge-safe auth config (no Prisma).
  */
-const { auth: middleware } = NextAuth(authConfig);
+const { auth } = NextAuth(authConfig);
 
-export default middleware((req) => {
-  const isLoggedIn = !!req.auth?.user;
-  const { pathname } = req.nextUrl;
+const PROTECTED = ["/dashboard", "/analytics", "/profile", "/settings"];
 
-  // Protect dashboard, analytics, profile, settings, and activity routes.
-  const protectedPaths = [
-    "/dashboard",
-    "/analytics",
-    "/profile",
-    "/settings",
-    "/activity",
-  ];
+function contentSecurityPolicy(nonce: string): string {
+  const dev = process.env.NODE_ENV !== "production";
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`,
+    // Inline style attributes are used by charts and colour swatches.
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://lh3.googleusercontent.com",
+    "font-src 'self'",
+    `connect-src 'self'${dev ? " ws:" : ""}`,
+    "worker-src 'self'",
+    "manifest-src 'self'",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self' https://accounts.google.com",
+    "object-src 'none'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
 
-  const isProtected = protectedPaths.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`)
-  );
+export default auth((req) => {
+  const { pathname, search } = req.nextUrl;
+  const isProtected = PROTECTED.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
-  if (isProtected && !isLoggedIn) {
-    // Preserve intended destination for post-login redirect.
-    const loginUrl = req.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    loginUrl.search = "";
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+  if (isProtected && !req.auth?.user) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    url.searchParams.set("callbackUrl", `${pathname}${search}`);
+    return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  const nonce = btoa(crypto.randomUUID());
+  const csp = contentSecurityPolicy(nonce);
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+
+  const res = NextResponse.next({ request: { headers: requestHeaders } });
+  res.headers.set("Content-Security-Policy", csp);
+  if (isProtected) res.headers.set("Cache-Control", "private, no-store");
+  return res;
 });
 
 export const config = {
-  // Run on all page routes; skip static assets and /api/auth (handled by NextAuth).
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icons/|manifest.webmanifest|sw.js|api/auth).*)",
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico|icon.svg|icons/|manifest.webmanifest|sw.js|robots.txt|sitemap.xml|opengraph-image).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
   ],
 };

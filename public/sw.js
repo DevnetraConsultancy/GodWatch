@@ -1,99 +1,68 @@
-/* God Watch Service Worker — offline support + background sync. */
+/* God Watch service worker.
+ * Caches public static assets only. Signed-in pages and API responses are
+ * never stored, so nobody can read your data from the cache on a shared device.
+ */
+const VERSION = "gw-v2";
+const OFFLINE_URL = "/offline";
+const PRECACHE = [OFFLINE_URL, "/icon.svg", "/icons/icon-192.png", "/manifest.webmanifest"];
 
-const CACHE_NAME = "godwatch-v1";
-const APP_SHELL = [
-  "/",
-  "/dashboard",
-  "/analytics",
-  "/profile",
-  "/settings",
-  "/login",
-  "/manifest.webmanifest",
-];
-
-// Install: pre-cache the app shell.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())
+    caches.open(VERSION).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting())
   );
 });
 
-// Activate: clean up old caches.
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
-// Fetch: network-first for navigations, cache-first for static assets.
+function isStaticAsset(url) {
+  return (
+    url.origin === self.location.origin &&
+    (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname === "/icon.svg")
+  );
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
+  const url = new URL(request.url);
 
-  // API & auth requests: never cache — always network.
-  if (request.url.includes("/api/") || request.url.includes("/_next/")) {
-    event.respondWith(fetch(request).catch(() => caches.match(request)));
-    return;
-  }
-
-  // Navigations: network-first, fall back to cached shell for offline.
+  // Pages: always network; show the offline page if the network is down.
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))
-    );
+    event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)));
     return;
   }
 
-  // Static assets: cache-first with background refresh.
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      const network = fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || network;
-    })
-  );
-});
-
-// Background sync: notify clients to flush their offline queue.
-self.addEventListener("sync", (event) => {
-  if (event.tag === "godwatch-sync") {
-    event.waitUntil(
-      self.clients.matchAll().then((clients) => {
-        clients.forEach((client) => client.postMessage({ type: "SYNC_OFFLINE_QUEUE" }));
-      })
+  // Hashed static files never change, so cache-first is safe.
+  if (isStaticAsset(url)) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (response.ok) {
+              const copy = response.clone();
+              caches.open(VERSION).then((cache) => cache.put(request, copy));
+            }
+            return response;
+          })
+      )
     );
   }
 });
 
-// Notification click: focus the dashboard.
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
-      for (const client of clients) {
-        if ("focus" in client) {
-          client.focus();
-          return;
-        }
-      }
-      return self.clients.openWindow("/dashboard");
+      const open = clients.find((c) => "focus" in c);
+      return open ? open.focus() : self.clients.openWindow("/dashboard");
     })
   );
 });
-

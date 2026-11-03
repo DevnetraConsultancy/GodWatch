@@ -1,58 +1,52 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { auth } from "@/auth";
-import { Providers } from "@/components/providers/providers";
+import { Providers } from "@/components/providers";
+import { PwaRegister } from "@/features/pwa/pwa-register";
+import { APP_DESCRIPTION, APP_NAME, APP_TAGLINE } from "@/lib/constants";
 import "./globals.css";
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const title = `${APP_NAME} | ${APP_TAGLINE}`;
+
 export const metadata: Metadata = {
-  title: {
-    default: "God Watch — Every Day Leaves Evidence",
-    template: "%s · God Watch",
-  },
-  description:
-    "A date-first habit tracker and daily checklist. Record whether each task was completed, failed, or missed — and build consistency through analytics and long-term tracking.",
-  keywords: ["habit tracker", "daily checklist", "consistency", "streaks", "productivity"],
+  metadataBase: new URL(siteUrl),
+  title: { default: title, template: `%s | ${APP_NAME}` },
+  description: APP_DESCRIPTION,
+  applicationName: APP_NAME,
   authors: [{ name: "Devnetra Consultancy" }],
-  applicationName: "God Watch",
+  keywords: ["habit tracker", "daily checklist", "streaks", "consistency", "productivity"],
   manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "God Watch",
-  },
-  openGraph: {
-    title: "God Watch — Every Day Leaves Evidence",
-    description: "A date-first habit tracker and daily checklist.",
-    type: "website",
-  },
+  icons: { icon: "/icon.svg", apple: "/icons/icon-192.png" },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: APP_NAME },
+  openGraph: { type: "website", siteName: APP_NAME, title, description: APP_DESCRIPTION, url: "/" },
+  twitter: { card: "summary_large_image", title, description: APP_DESCRIPTION },
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
-  ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f3f4f9" },
+    { media: "(prefers-color-scheme: dark)", color: "#07080f" },
+  ],
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const session = await auth();
-
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}
-      >
-        <Providers session={session}>{children}</Providers>
+    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-fg"
+        >
+          Skip to content
+        </a>
+        <Providers nonce={nonce}>{children}</Providers>
+        <PwaRegister />
       </body>
     </html>
   );
 }
-
