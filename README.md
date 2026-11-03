@@ -1,6 +1,6 @@
 # 🛡️ God Watch — Every Day Leaves Evidence
 
-A premium, production-grade SaaS habit tracker and daily checklist — organized by date, not by task. Built with Next.js 15, React 19, TypeScript, Tailwind CSS, Supabase PostgreSQL, and Auth.js.
+A habit tracker and daily checklist organized by date, not by task. Built with Next.js 15, React 19, TypeScript, Tailwind CSS, PostgreSQL, and Auth.js.
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
@@ -12,10 +12,10 @@ A premium, production-grade SaaS habit tracker and daily checklist — organized
 ## ✨ Features
 
 ### Core
-- **Date-first dashboard** — sticky date rail auto-scrolls to today, task columns expand dynamically with horizontal scrolling.
+- **Date-first dashboard** — a grid with today on top, sticky dates and task headers, and earlier days on demand.
 - **Task management** — add, rename, delete, archive, reorder, and color-code unlimited tasks.
 - **Status cell engine** — each cell cycles through Pending → Completed → Failed → Missed with a confirmation dialog.
-- **Month separators** — beautifully styled quote cards between months.
+- **Month separators** — month labels between the rows of the grid.
 - **Notes** — autosave notes per date.
 
 ### Analytics
@@ -31,9 +31,9 @@ A premium, production-grade SaaS habit tracker and daily checklist — organized
 - **Google OAuth only** — SSO via Auth.js v5.
 - **User isolation** — every user sees only their own data.
 - **Activity log** — full audit trail of all user actions.
-- **Rate limiting** — in-memory (drop-in Redis/Upstash for production multi-instance).
+- **Rate limiting** — per user on every server action; in-memory, so per instance on serverless (drop-in Redis/Upstash for a global limit).
 - **Zod validation** — shared schemas between client and server.
-- **CSRF, XSS, SQL injection** — protections via Prisma prepared statements, Next.js headers, input sanitization.
+- **CSRF, XSS, SQL injection** — Server Action origin checks, a nonce-based Content Security Policy, and Prisma parameterized queries.
 
 ### Quality of Life
 - **Keyboard shortcuts** — `1` (Completed), `2` (Failed), `3` (Missed), `0` (Pending), `Cmd+K` (Search), `Cmd+Z` (Undo).
@@ -41,9 +41,9 @@ A premium, production-grade SaaS habit tracker and daily checklist — organized
 - **Undo** — Zustand-powered undo stack for the last action.
 - **Encouraging toasts** — Sonner toasts react to every status change.
 - **Dark/light/system theme** — next-themes powered.
-- **PWA** — installable, offline shell, service worker auto-sync.
+- **PWA** — installable; status changes made offline are queued on the device and sync on reconnect. Signed-in pages are never cached.
 - **Daily reminders** — browser notifications at configurable time.
-- **Global search** — search all task names and dates.
+- **Global search** — search task names, notes, and dates.
 - **Export CSV/PDF** — download your data.
 
 ### Accessibility
@@ -78,9 +78,9 @@ A premium, production-grade SaaS habit tracker and daily checklist — organized
 |---|---|
 | **RSC for reads, actions for writes** | Smaller client bundle, faster LCP, built-in cache revalidation. |
 | **`TaskStatus(taskId, date)` composite unique** | Fully normalized row-per-cell; trivial analytics aggregation. |
-| **Zustand + localStorage** | Optimistic state, offline queue, undo stack, instant cell clicks. |
+| **Local component state + localStorage queue** | Optimistic updates with rollback, offline status queue, undo stack. |
 | **JWT session strategy** | Zero DB lookups on hot paths; edge-deployable. |
-| **UTC-normalized `date` stored as `String @db.Date`** | Eliminates timezone drift; client renders in local time. |
+| **Calendar `date` stored as a yyyy-MM-dd string** | A cell belongs to the user's own day. The browser's timezone reaches the server in a validated cookie, so server and client agree on "today". |
 | **Zod as single validation source** | Shared across client and server; eliminates drift. |
 
 ---
@@ -269,15 +269,17 @@ Typography uses Geist (Geist Sans + Geist Mono) for a clean, modern look.
 
 ## 🔒 Security
 
-- **Google OAuth only** — no password storage.
-- **Row-level security via userId** — every query includes `WHERE userId = ?`.
+- **Google OAuth only** — no password storage; verified Google emails only; Google's tokens aren't stored.
+- **Isolation by userId** — every query is scoped to the signed-in user, including writes.
 - **CSRF protection** — Next.js Server Actions enforce `Origin` header checks.
-- **XSS prevention** — React's default escaping + Content Security Policy headers.
-- **SQL injection prevention** — Prisma uses parameterized queries / prepared statements.
-- **Input validation** — Zod schemas on every API endpoint.
-- **Rate limiting** — 60 requests/minute per IP.
-- **HTTPS enforced** — via Vercel + HSTS header.
-- **Secure cookies** — `httpOnly`, `sameSite`, `secure` flags.
+- **XSS prevention** — React's escaping + a per-request nonce Content Security Policy (`src/middleware.ts`).
+- **SQL injection prevention** — Prisma uses parameterized queries.
+- **Input validation** — Zod schemas on every server action, including ids.
+- **Rate limiting** — per user, per action type. In-memory: see the note in `src/lib/rate-limit.ts`.
+- **Open redirect prevention** — post-login redirects accept same-origin paths only.
+- **No sensitive caching** — the service worker stores only public static files.
+- **CSV injection prevention** — exported cells that start with a formula character are neutralized.
+- **Secure cookies** — `httpOnly`, `sameSite`, `secure` flags (Auth.js defaults).
 
 ---
 

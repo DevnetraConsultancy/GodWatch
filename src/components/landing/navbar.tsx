@@ -41,16 +41,16 @@ export function LandingNav() {
         className={cn(
           "mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 transition-all duration-300 sm:px-6",
           scrolled
-            ? "mt-3 rounded-2xl border border-border/60 bg-background/80 shadow-lg shadow-black/5 backdrop-blur-xl"
+            ? "lg lg-lens mt-3 rounded-full"
             : "mt-0 border border-transparent"
         )}
       >
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-600 shadow-md shadow-amber-500/25">
-            <Icons.logo className="h-4 w-4 text-white" />
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg lg-gold">
+            <Icons.logo className="h-4 w-4" />
           </span>
-          <span className="text-sm font-semibold tracking-tight">{APP_NAME}</span>
+          <span className="font-display text-base font-semibold tracking-tight">{APP_NAME}</span>
         </Link>
 
         {/* Desktop links */}
@@ -74,7 +74,7 @@ export function LandingNav() {
           </Button>
           <Button
             asChild
-            className="hidden bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25 hover:from-amber-500/90 hover:to-orange-600/90 sm:inline-flex"
+            className="hidden  sm:inline-flex"
           >
             <Link href="/login">
               Start free
@@ -102,7 +102,7 @@ export function LandingNav() {
           initial={reduced ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
-          className="mx-4 mt-2 rounded-2xl border bg-background/95 p-3 shadow-xl backdrop-blur-xl md:hidden"
+          className="lg-strong mx-4 mt-2 rounded-3xl p-3 md:hidden"
         >
           <nav className="flex flex-col gap-1" aria-label="Mobile">
             {NAV_LINKS.map((l) => (
@@ -122,7 +122,7 @@ export function LandingNav() {
             </Button>
             <Button
               asChild
-              className="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 text-white"
+              className="flex-1 "
             >
               <Link href="/login">Start free</Link>
             </Button>

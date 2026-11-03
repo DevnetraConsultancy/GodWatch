@@ -24,11 +24,11 @@ function intensity(week: number, day: number): number {
 }
 
 const LEVEL_CLASS = [
-  "bg-muted",
-  "bg-amber-500/25",
-  "bg-amber-500/45",
-  "bg-amber-500/70",
-  "bg-amber-500",
+  "bg-foreground/[0.07]",
+  "bg-primary/30",
+  "bg-primary/50",
+  "bg-primary/75",
+  "bg-primary",
 ];
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -67,7 +67,6 @@ export function AnalyticsShowcase() {
     <section id="analytics" className="scroll-mt-24 py-24 sm:py-32">
       <div className="container">
         <SectionHeading
-          eyebrow="Analytics"
           title="Your consistency, rendered visible."
           description="Heatmaps, streaks, task-wise performance, and best/worst months — all computed from the same cells you mark every day."
         />
@@ -75,7 +74,7 @@ export function AnalyticsShowcase() {
         <div className="mt-14 grid gap-6 lg:grid-cols-5">
           {/* Heatmap card */}
           <Reveal className="lg:col-span-3">
-            <div className="h-full rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
+            <div className="h-full lg rounded-[1.75rem] p-5 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-semibold">Activity heatmap</h3>
@@ -131,7 +130,7 @@ export function AnalyticsShowcase() {
               </div>
 
               {/* Mini metrics footer */}
-              <div className="mt-4 grid grid-cols-3 divide-x rounded-xl border bg-background/50">
+              <div className="mt-4 grid grid-cols-3 divide-x lg-well rounded-2xl">
                 {[
                   { label: "This week", value: "92%" },
                   { label: "Days tracked", value: "182" },
@@ -154,7 +153,7 @@ export function AnalyticsShowcase() {
           <div className="grid gap-6 sm:grid-cols-3 lg:col-span-2 lg:grid-cols-1">
             {STATS.map((s, i) => (
               <Reveal key={s.label} delay={i * 0.1}>
-                <div className="group rounded-2xl border bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/5">
+                <div className="group lg rounded-[1.75rem] p-5">
                   <div className="flex items-center gap-2.5">
                     <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
                       <s.icon className={`h-4 w-4 ${s.tone}`} />

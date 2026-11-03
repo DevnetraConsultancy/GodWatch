@@ -79,12 +79,12 @@ export function HowItWorks() {
     {
       n: "01",
       title: "Pick a date",
-      body: "The sticky rail auto-scrolls to today. Scroll back to any day in history.",
+      body: "Today sits at the top of your grid. Scroll down to any earlier day.",
     },
     {
       n: "02",
       title: "Mark the cell",
-      body: "Click to cycle — or press 1 / 2 / 3 / 0. Confirmation keeps you honest.",
+      body: "Click to cycle and confirm, or focus a cell and press 1, 2, 3 or 0.",
     },
     {
       n: "03",
@@ -96,23 +96,19 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative scroll-mt-24 border-y bg-card/30 py-24 sm:py-32"
+      className="relative scroll-mt-24 py-24 sm:py-32"
     >
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-grid-dense opacity-60 mask-fade-center" />
-      </div>
 
       <div className="container">
         <SectionHeading
-          eyebrow="How it works"
           title="One cell. Four honest answers."
-          description="Try it yourself — click the cell or focus it and press 1, 2, 3, 0. This is the exact engine that powers your dashboard."
+          description="Click the cell, or focus it and press 1, 2, 3, 0. It works the same way in your dashboard."
         />
 
         <div className="mt-14 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           {/* Interactive demo */}
           <Reveal>
-            <div className="rounded-2xl border bg-card p-6 shadow-xl shadow-black/5 sm:p-8">
+            <div className="lg rounded-[1.75rem] p-6 sm:p-8">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span className="font-medium">Thu · Oct 09</span>
                 <span>
@@ -223,7 +219,7 @@ export function HowItWorks() {
             {steps.map((s, i) => (
               <Reveal key={s.n} delay={i * 0.1}>
                 <div className="flex gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-background font-mono text-xs font-semibold text-amber-600 dark:text-amber-400">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center lg-well rounded-full font-display text-sm font-semibold text-primary">
                     {s.n}
                   </div>
                   <div>
@@ -248,7 +244,7 @@ export function HowItWorks() {
               <Button
                 asChild
                 size="lg"
-                className="mt-2 h-12 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-7 text-white shadow-lg shadow-amber-500/25 hover:from-amber-500/90 hover:to-orange-600/90"
+                className="mt-2 h-12 rounded-full px-7"
               >
                 <a href="#analytics">
                   See the analytics

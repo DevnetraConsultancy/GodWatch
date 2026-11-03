@@ -100,7 +100,7 @@ function FloatingChip({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.6, delay, ease: "easeOut" }}
       className={cn(
-        "absolute hidden items-center gap-2 rounded-xl border bg-card/90 px-3 py-2 text-xs font-medium shadow-xl backdrop-blur-xl sm:flex",
+        "absolute hidden items-center gap-2 lg-well rounded-2xl px-3 py-2 text-xs font-medium shadow-xl sm:flex",
         className
       )}
     >
@@ -129,10 +129,10 @@ export function ProductMock() {
         initial={reduced ? false : { opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-        className="overflow-hidden rounded-2xl border bg-card/80 shadow-2xl shadow-black/10 backdrop-blur-xl"
+        className="overflow-hidden lg rounded-[1.75rem]"
       >
         {/* Window chrome */}
-        <div className="flex items-center gap-3 border-b bg-muted/40 px-4 py-2.5">
+        <div className="flex items-center gap-3 border-b border-[var(--hairline)] px-4 py-2.5">
           <div className="flex gap-1.5" aria-hidden>
             <span className="h-2.5 w-2.5 rounded-full bg-danger/60" />
             <span className="h-2.5 w-2.5 rounded-full bg-warning/60" />
@@ -177,7 +177,7 @@ export function ProductMock() {
                 initial={reduced ? false : { opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.55 + ci * 0.1 }}
-                className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-xl border bg-card p-2 shadow-sm"
+                className="flex min-w-0 flex-1 flex-col gap-1.5 lg-well rounded-2xl p-2"
               >
                 <div className="flex items-center gap-1.5 px-0.5">
                   <span
@@ -216,7 +216,7 @@ export function ProductMock() {
         </div>
 
         {/* Bottom status bar */}
-        <div className="flex items-center justify-between border-t bg-muted/30 px-4 py-2 text-[11px] text-muted-foreground">
+        <div className="flex items-center justify-between border-t border-[var(--hairline)] px-4 py-2 text-[11px] text-muted-foreground">
           <span>6-day streak alive</span>
           <span className="hidden sm:inline">Press 1 / 2 / 3 / 0 to mark</span>
           <span className="font-semibold text-success">87% this week</span>

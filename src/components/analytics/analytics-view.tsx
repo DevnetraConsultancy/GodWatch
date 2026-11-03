@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import {
   Activity,
   Calendar,
@@ -48,17 +47,13 @@ export function AnalyticsView({
   ];
 
   return (
-    <div className="container space-y-6 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
+    <div className="mx-auto w-full max-w-[1400px] space-y-5 px-3 py-8 sm:px-4">
+      <div>
+        <h1 className="text-4xl font-semibold tracking-tight">Analytics</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Your consistency, measured. Every day leaves evidence.
         </p>
-      </motion.div>
+      </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -66,29 +61,25 @@ export function AnalyticsView({
           label="Daily"
           value={`${analytics.daily}%`}
           sub="Today's completion"
-          icon={<Activity className="h-4 w-4" />}
-          delay={0}
+          icon={<Activity className="h-4 w-4" />}
         />
         <StatCard
           label="Weekly"
           value={`${analytics.weekly}%`}
           sub="Last 7 days"
-          icon={<Calendar className="h-4 w-4" />}
-          delay={0.05}
+          icon={<Calendar className="h-4 w-4" />}
         />
         <StatCard
           label="Monthly"
           value={`${analytics.monthly}%`}
           sub="Last 30 days"
-          icon={<TrendingUp className="h-4 w-4" />}
-          delay={0.1}
+          icon={<TrendingUp className="h-4 w-4" />}
         />
         <StatCard
           label="Yearly"
           value={`${analytics.yearly}%`}
           sub="Last 365 days"
-          icon={<Award className="h-4 w-4" />}
-          delay={0.15}
+          icon={<Award className="h-4 w-4" />}
         />
       </div>
 
@@ -97,36 +88,32 @@ export function AnalyticsView({
           label="Current Streak"
           value={`${analytics.currentStreak}d`}
           sub="Keep it going!"
-          icon={<Flame className="h-4 w-4 text-warning" />}
-          delay={0.2}
+          icon={<Flame className="h-4 w-4 text-warning" />}
         />
         <StatCard
           label="Longest Streak"
           value={`${analytics.longestStreak}d`}
           sub="Your personal best"
-          icon={<Trophy className="h-4 w-4 text-warning" />}
-          delay={0.25}
+          icon={<Trophy className="h-4 w-4 text-warning" />}
         />
         <StatCard
           label="Best Month"
           value={analytics.bestMonth?.month ?? "—"}
           sub={analytics.bestMonth ? `${analytics.bestMonth.rate}% completion` : "No data yet"}
-          icon={<CheckCircle2 className="h-4 w-4 text-success" />}
-          delay={0.3}
+          icon={<CheckCircle2 className="h-4 w-4 text-success" />}
         />
         <StatCard
           label="Worst Month"
           value={analytics.worstMonth?.month ?? "—"}
           sub={analytics.worstMonth ? `${analytics.worstMonth.rate}% completion` : "No data yet"}
-          icon={<AlertCircle className="h-4 w-4 text-danger" />}
-          delay={0.35}
+          icon={<AlertCircle className="h-4 w-4 text-danger" />}
         />
       </div>
 
       {/* Heatmap */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Consistency Heatmap</CardTitle>
+          <CardTitle className="text-base">Consistency heatmap</CardTitle>
         </CardHeader>
         <CardContent>
           <Heatmap data={heatmap} />

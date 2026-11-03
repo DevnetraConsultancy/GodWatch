@@ -29,11 +29,11 @@ export function CompletionTrendChart({
       <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
         <defs>
           <linearGradient id="completionGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.4} />
-            <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
+            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" vertical={false} />
         <XAxis
           dataKey="label"
           tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
@@ -51,9 +51,10 @@ export function CompletionTrendChart({
         />
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--popover))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: 8,
+            background: "linear-gradient(145deg, var(--glass-strong-a), var(--glass-strong-b))",
+            color: "hsl(var(--foreground))",
+            border: "1px solid var(--glass-edge)",
+            borderRadius: 14,
             fontSize: 12,
           }}
           formatter={(value: number | string) => [`${value}%`, "Completion"]}
@@ -61,7 +62,7 @@ export function CompletionTrendChart({
         <Area
           type="monotone"
           dataKey="completion"
-          stroke="hsl(var(--success))"
+          stroke="hsl(var(--primary))"
           strokeWidth={2}
           fill="url(#completionGrad)"
           dot={false}
@@ -105,9 +106,10 @@ export function StatusPieChart({
         </Pie>
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--popover))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: 8,
+            background: "linear-gradient(145deg, var(--glass-strong-a), var(--glass-strong-b))",
+            color: "hsl(var(--foreground))",
+            border: "1px solid var(--glass-edge)",
+            borderRadius: 14,
             fontSize: 12,
           }}
         />
@@ -134,7 +136,7 @@ export function TaskPerformanceChart({ data }: { data: TaskPerformance[] }) {
   return (
     <ResponsiveContainer width="100%" height={Math.max(260, sorted.length * 40)}>
       <BarChart data={sorted} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" horizontal={false} />
         <XAxis type="number" unit="%" domain={[0, 100]} hide />
         <YAxis
           type="category"
@@ -146,9 +148,10 @@ export function TaskPerformanceChart({ data }: { data: TaskPerformance[] }) {
         />
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--popover))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: 8,
+            background: "linear-gradient(145deg, var(--glass-strong-a), var(--glass-strong-b))",
+            color: "hsl(var(--foreground))",
+            border: "1px solid var(--glass-edge)",
+            borderRadius: 14,
             fontSize: 12,
           }}
           formatter={(value: number | string) => [`${value}%`, "Completion rate"]}
@@ -172,7 +175,7 @@ export function DailyBarsChart({
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--hairline)" vertical={false} />
         <XAxis
           dataKey="label"
           tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
@@ -189,9 +192,10 @@ export function DailyBarsChart({
         />
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--popover))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: 8,
+            background: "linear-gradient(145deg, var(--glass-strong-a), var(--glass-strong-b))",
+            color: "hsl(var(--foreground))",
+            border: "1px solid var(--glass-edge)",
+            borderRadius: 14,
             fontSize: 12,
           }}
         />

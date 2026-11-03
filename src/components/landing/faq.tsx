@@ -17,11 +17,11 @@ const FAQS = [
   },
   {
     q: "Does it work offline?",
-    a: "Yes. God Watch is an installable PWA with a service worker. Actions are queued locally and sync when you're back online, so your evidence never depends on a connection.",
+    a: "Mostly. Install it as an app, and status changes you make while your connection drops are saved on your device and sync when you're back. Opening a page needs a connection, so your private data is never stored in the browser's cache.",
   },
   {
     q: "Can I get my data out?",
-    a: "Any time. Export the full record as CSV or a formatted PDF report from Settings. Your data belongs to you — every query is scoped to your account.",
+    a: "Any time. Export the last 365 days as CSV or a PDF report from Settings. Your data belongs to you — every query is scoped to your account.",
   },
   {
     q: "Is it free?",
@@ -41,13 +41,12 @@ export function FAQ() {
     <section id="faq" className="scroll-mt-24 py-24 sm:py-32">
       <div className="container">
         <SectionHeading
-          eyebrow="FAQ"
           title="Questions, answered."
           description="Everything you need to know before you start leaving evidence."
         />
 
         <Reveal className="mx-auto mt-12 max-w-3xl">
-          <div className="divide-y rounded-2xl border bg-card">
+          <div className="divide-y divide-[var(--hairline)] lg rounded-[1.75rem]">
             {FAQS.map((f, i) => {
               const isOpen = open === i;
               return (
@@ -65,7 +64,7 @@ export function FAQ() {
                       className={cn(
                         "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors",
                         isOpen
-                          ? "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                          ? "border-amber-500/40 bg-amber-500/10 text-primary"
                           : "text-muted-foreground"
                       )}
                       aria-hidden

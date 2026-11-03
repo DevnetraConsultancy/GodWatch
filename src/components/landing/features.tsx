@@ -31,7 +31,7 @@ const FEATURES: Feature[] = [
     icon: CalendarRange,
     title: "Date-first dashboard",
     description:
-      "Your habits live on a scrolling date rail, not an endless list. Every day is a column of evidence — scroll back through months at a glance.",
+      "Your habits live in a grid with today on top. Every day is a row of evidence, and months of history are one scroll away.",
     wide: true,
     visual: (
       <div className="mt-4 flex gap-1.5 overflow-hidden rounded-lg border bg-background/60 p-2">
@@ -56,7 +56,7 @@ const FEATURES: Feature[] = [
     icon: Flame,
     title: "Streaks that mean something",
     description:
-      "Current and longest streaks computed from real cell states — no participation trophies.",
+      "Current and longest streaks count only days where every task was completed.",
     visual: (
       <div className="mt-4 flex items-baseline gap-2">
         <span className="text-4xl font-semibold tracking-tight text-gradient-gold">
@@ -115,7 +115,7 @@ const FEATURES: Feature[] = [
     icon: Undo2,
     title: "Undo everything",
     description:
-      "Fat-fingered a cell? One ⌘Z rewinds the last action from an optimistic Zustand stack.",
+      "Marked the wrong cell? One ⌘Z puts it back.",
   },
   {
     icon: Download,
@@ -127,7 +127,7 @@ const FEATURES: Feature[] = [
     icon: WifiOff,
     title: "Offline-ready PWA",
     description:
-      "Install it, use it on a plane, and let the service worker sync when you're back online.",
+      "Install it like an app. Status changes made without a connection sync when you're back online.",
   },
   {
     icon: Bell,
@@ -154,14 +154,13 @@ export function Features() {
     <section id="features" className="relative scroll-mt-24 py-24 sm:py-32">
       <div className="container">
         <SectionHeading
-          eyebrow="Everything you need"
           title={
             <>
               Built for consistency,
               <br className="hidden sm:block" /> not for busywork.
             </>
           }
-          description="A status-cell engine, real analytics, and keyboard speed — wrapped in a PWA that works anywhere."
+          description="Four honest states for every day, real analytics, and shortcuts that make marking a day take seconds."
         />
 
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -175,9 +174,9 @@ export function Features() {
                 onMouseMove={(e) =>
                   trackSpotlight(e, e.currentTarget as HTMLElement)
                 }
-                className="spotlight group relative h-full overflow-hidden rounded-2xl border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/5"
+                className="spotlight group relative h-full overflow-hidden lg rounded-[1.75rem] p-6"
               >
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400/15 to-orange-500/15 text-amber-600 transition-transform duration-300 group-hover:scale-110 dark:text-amber-400">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400/20 to-orange-500/20 text-primary">
                   <f.icon className="h-5 w-5" />
                 </span>
                 <h3 className="mt-4 text-lg font-semibold tracking-tight">

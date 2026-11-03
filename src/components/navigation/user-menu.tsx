@@ -40,7 +40,7 @@ export function UserMenu({ session }: { session: Session }) {
           aria-label="Open profile menu"
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
+            <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} referrerPolicy="no-referrer" />
             <AvatarFallback className="bg-primary text-primary-foreground text-xs">
               {initials}
             </AvatarFallback>
@@ -71,7 +71,7 @@ export function UserMenu({ session }: { session: Session }) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="cursor-pointer text-destructive focus:text-destructive"
+          className="cursor-pointer text-danger focus:text-danger"
           onClick={handleSignOut}
         >
           <LogOut className="mr-2 h-4 w-4" />

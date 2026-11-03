@@ -26,16 +26,16 @@ export function LandingFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t bg-card/30">
+    <footer className="">
       <div className="container py-12 sm:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-600 shadow-md shadow-amber-500/25">
-                <Icons.logo className="h-4 w-4 text-white" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg lg-gold">
+                <Icons.logo className="h-4 w-4" />
               </span>
-              <span className="text-sm font-semibold tracking-tight">
+              <span className="font-display text-base font-semibold tracking-tight">
                 {APP_NAME}
               </span>
             </Link>
@@ -54,7 +54,7 @@ export function LandingFooter() {
           {/* Link columns */}
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <h3 className="text-xs font-semibold text-muted-foreground">
                 {col.title}
               </h3>
               <ul className="mt-4 space-y-2.5">

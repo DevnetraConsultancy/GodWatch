@@ -22,16 +22,16 @@ export function HabitMarquee() {
   return (
     <section
       aria-label="Habits you can track"
-      className="relative border-y bg-card/40 py-5"
+      className="relative py-5"
     >
       <div className="mask-fade-x overflow-hidden">
         <div className="flex w-max animate-marquee items-center gap-3 hover:[animation-play-state:paused]">
           {row.map((habit, i) => (
             <span
               key={`${habit}-${i}`}
-              className="flex shrink-0 items-center gap-2 rounded-full border bg-background/70 px-4 py-2 text-sm text-muted-foreground backdrop-blur"
+              className="flex shrink-0 items-center gap-2 lg-well rounded-full px-4 py-2 text-sm text-muted-foreground"
             >
-              <Repeat className="h-3.5 w-3.5 text-amber-500" aria-hidden />
+              <Repeat className="h-3.5 w-3.5 text-primary" aria-hidden />
               {habit}
             </span>
           ))}
