@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+import { Geist } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { PwaRegister } from "@/features/pwa/pwa-register";
 import { APP_DESCRIPTION, APP_NAME, APP_TAGLINE } from "@/lib/constants";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+// One font, Latin subset only (self-hosted at build time by next/font).
+const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans", display: "swap" });
+
+const siteUrl =process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 const title = `${APP_NAME} | ${APP_TAGLINE}`;
 
 export const metadata: Metadata = {
@@ -36,7 +38,7 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
-    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={geistSans.variable}>
       <body>
         <a
           href="#main"

@@ -1,8 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { ThemeProvider, useTheme } from "next-themes";
-import { Toaster } from "sonner";
-import { TooltipProvider } from "@/components/ui/primitives";
+
+// Toasts only follow user actions, so the toaster loads after first paint
+// instead of shipping with every page's critical JavaScript.
+const Toaster = dynamic(() => import("sonner").then((m) => m.Toaster), { ssr: false });
 
 const toastStyle: React.CSSProperties = {
   background: "var(--glass-strong)",
@@ -38,10 +41,8 @@ function ThemedToaster() {
 export function Providers({ nonce, children }: { nonce?: string; children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange nonce={nonce}>
-      <TooltipProvider delayDuration={300}>
-        {children}
-        <ThemedToaster />
-      </TooltipProvider>
+      {children}
+      <ThemedToaster />
     </ThemeProvider>
   );
 }
