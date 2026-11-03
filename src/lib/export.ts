@@ -1,74 +1,47 @@
-"use client";
+import { addDays, dateRange, type ISODate } from "@/lib/dates";
+import { effectiveSpans, indexCells, isActiveOn, type Cell, type HabitSpan } from "@/lib/stats";
+import { STATUS_LABELS } from "@/lib/status";
+
+/** One line of an export: a habit on a day it was active. */
+export interface ExportRow {
+  date: ISODate;
+  task: string;
+  status: string;
+}
+
+export const EXPORT_DAYS = 365;
+
+/** Rows for the last `days` days, newest first, only where the habit was active. */
+export function buildExportRows(
+  habits: (HabitSpan & { name: string })[],
+  cells: Cell[],
+  today: ISODate,
+  days = EXPORT_DAYS
+): ExportRow[] {
+  const spans = effectiveSpans(habits, cells);
+  const index = indexCells(cells);
+  const rows: ExportRow[] = [];
+  for (const date of dateRange(addDays(today, -(days - 1)), today).reverse()) {
+    spans.forEach((habit, i) => {
+      if (!isActiveOn(habit, date)) return;
+      const status = index.get(habit.id)?.get(date) ?? "PENDING";
+      rows.push({ date, task: habits[i]!.name, status: STATUS_LABELS[status] });
+    });
+  }
+  return rows;
+}
 
 /**
- * Export utilities: CSV + PDF.
- * Runs entirely client-side (jsPDF + jspdf-autotable).
+ * Escape one CSV field. Values that a spreadsheet would run as a formula
+ * (starting with = + - @ tab or CR) are prefixed with a quote.
  */
-
-export interface ExportRow {
-  task: string;
-  date: string;
-  status: string;
-  note?: string;
+export function csvField(value: string): string {
+  const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  return /[",\n\r]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "Pending",
-  COMPLETED: "Completed",
-  FAILED: "Failed",
-  MISSED: "Missed",
-};
-
-/** Download helper. */
-function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+export function toCSV(rows: ExportRow[]): string {
+  const lines = ["Date,Task,Status"];
+  for (const r of rows) lines.push([r.date, r.task, r.status].map(csvField).join(","));
+  return `${lines.join("\r\n")}\r\n`;
 }
-
-/** Export rows to CSV. */
-export function exportToCSV(rows: ExportRow[], filename = "god-watch-export.csv") {
-  const header = ["Task", "Date", "Status"];
-  const lines = [header.join(",")];
-  for (const r of rows) {
-    const escaped = [r.task, r.date, STATUS_LABEL[r.status] ?? r.status].map((v) =>
-      `"${v.replace(/"/g, '""')}"`
-    );
-    lines.push(escaped.join(","));
-  }
-  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
-  downloadBlob(blob, filename);
-}
-
-/** Export rows to PDF (requires jspdf + jspdf-autotable). */
-export async function exportToPDF(rows: ExportRow[], filename = "god-watch-export.pdf") {
-  const { jsPDF } = await import("jspdf");
-  const autoTable = (await import("jspdf-autotable")).default;
-
-  const doc = new jsPDF({ orientation: "landscape" });
-
-  doc.setFontSize(18);
-  doc.text("God Watch — Export", 14, 20);
-  doc.setFontSize(10);
-  doc.setTextColor(100);
-  doc.text(`Every Day Leaves Evidence. Generated ${new Date().toLocaleDateString()}`, 14, 26);
-
-  autoTable(doc, {
-    head: [["Task", "Date", "Status"]],
-    body: rows.map((r) => [r.task, r.date, STATUS_LABEL[r.status] ?? r.status]),
-    startY: 32,
-    styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [41, 98, 255], textColor: 255, fontStyle: "bold" },
-    alternateRowStyles: { fillColor: [245, 245, 245] },
-  });
-
-  doc.save(filename);
-}
-
-// buildExportRows moved to src/lib/export-helpers.ts (no "use client")
-

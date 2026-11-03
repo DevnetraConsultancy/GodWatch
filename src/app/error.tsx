@@ -1,25 +1,32 @@
 "use client";
 
+import { useEffect } from "react";
+import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { ErrorState } from "@/components/ui/feedback";
 
-/** Global error boundary. */
-export default function Error({
-  error: _error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function RootError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
-      <AlertTriangle className="h-10 w-10 text-destructive" />
-      <h2 className="text-xl font-semibold">Something went wrong</h2>
-      <p className="max-w-md text-sm text-muted-foreground">
-        An unexpected error occurred. Please try again.
-      </p>
-      <Button onClick={reset}>Try again</Button>
-    </div>
+    <main id="main" className="container-page flex min-h-dvh items-center justify-center">
+      <div className="glass w-full max-w-lg rounded-xl">
+        <ErrorState
+          description={
+            <>
+              Something broke while loading this page.
+              {error.digest && <span className="mt-1 block font-mono text-xs">Reference: {error.digest}</span>}
+            </>
+          }
+          action={
+            <Button onClick={reset}>
+              <RotateCcw aria-hidden /> Try again
+            </Button>
+          }
+        />
+      </div>
+    </main>
   );
 }
-

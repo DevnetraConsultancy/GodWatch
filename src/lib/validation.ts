@@ -1,111 +1,80 @@
 import { z } from "zod";
-import { TASK_COLORS } from "@/lib/constants";
+import { TASK_COLORS, type TaskColor } from "@/lib/constants";
+import { isISODate, isValidTimeZone } from "@/lib/dates";
+import { STATUSES } from "@/lib/status";
 
 /**
- * Centralized Zod validation schemas for God Watch.
- * Used by both server actions and client components.
+ * Validation schemas shared by forms (client) and server actions (server).
+ * The server always re-validates; client checks are only for fast feedback.
  */
 
-const isoDateSchema = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in yyyy-MM-dd format")
-  .refine((v) => {
-    const d = new Date(`${v}T00:00:00Z`);
-    if (Number.isNaN(d.getTime())) return false;
-    // Reject rolled-over dates like 2024-13-45.
-    return d.toISOString().slice(0, 10) === v;
-  }, "Invalid date");
+export const idSchema = z.string().trim().min(1).max(64).regex(/^[a-z0-9]+$/i, "Invalid id");
 
-export { isoDateSchema };
+export const isoDateSchema = z.string().refine(isISODate, "Invalid date");
 
-const statusSchema = z.enum(["PENDING", "COMPLETED", "FAILED", "MISSED"]);
+export const statusSchema = z.enum(STATUSES);
 
-const taskNameSchema = z
+export const timeZoneSchema = z.string().refine(isValidTimeZone, "Unknown timezone");
+
+export const taskNameSchema = z
   .string()
   .trim()
-  .min(1, "Task name is required")
-  .max(100, "Task name must be 100 characters or fewer");
+  .min(1, "Give the habit a name")
+  .max(100, "Keep the name to 100 characters or fewer");
 
-const colorSchema = z
+export const colorSchema = z
   .string()
-  .regex(/^#([0-9a-fA-F]{6})$/, "Invalid color")
-  .refine((c) => TASK_COLORS.includes(c as (typeof TASK_COLORS)[number]), {
-    message: "Color must be from the allowed palette",
-  });
+  .refine((c): c is TaskColor => (TASK_COLORS as readonly string[]).includes(c), "Pick a colour from the palette");
 
-/** Create a task. */
 export const taskCreateSchema = z.object({
   name: taskNameSchema,
-  color: colorSchema.default("#6366f1"),
+  color: colorSchema.optional(),
 });
 
-/** Update a task (rename, recolor, archive). */
 export const taskUpdateSchema = z
   .object({
+    taskId: idSchema,
     name: taskNameSchema.optional(),
     color: colorSchema.optional(),
     archived: z.boolean().optional(),
   })
   .refine((d) => d.name !== undefined || d.color !== undefined || d.archived !== undefined, {
-    message: "At least one field must be provided",
+    message: "Nothing to update",
   });
 
-/** Update a cell's status. */
+export const taskDeleteSchema = z.object({ taskId: idSchema });
+
+export const taskReorderSchema = z.object({
+  orderedIds: z.array(idSchema).min(1).max(200),
+});
+
 export const statusUpdateSchema = z.object({
-  taskId: z.string().min(1),
+  taskId: idSchema,
   date: isoDateSchema,
   status: statusSchema,
 });
 
-/** Save a date note. */
 export const noteUpdateSchema = z.object({
   date: isoDateSchema,
-  content: z.string().max(10_000, "Note is too long"),
+  content: z.string().max(10_000, "Notes are limited to 10,000 characters"),
 });
 
-/** Reorder tasks via drag & drop. */
-export const taskReorderSchema = z.object({
-  orderedIds: z.array(z.string().min(1)).min(1, "At least one task is required"),
-});
+export const reminderTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:mm (24-hour)");
 
-/** Update user settings. */
 export const settingsUpdateSchema = z.object({
-  theme: z.enum(["light", "dark", "system"]).default("system"),
-  dailyReminderEnabled: z.boolean().default(false),
-  dailyReminderTime: z
-    .string()
-    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Time must be HH:mm (24-hour)")
-    .nullable()
-    .optional(),
-  dailyReminderChannel: z.enum(["browser", "email"]).default("browser"),
-  defaultTaskColor: colorSchema.default("#6366f1"),
+  dailyReminderEnabled: z.boolean(),
+  dailyReminderTime: reminderTimeSchema,
+  defaultTaskColor: colorSchema,
 });
 
-/** Search query. */
-export const searchQuerySchema = z.object({
-  q: z.string().trim().max(200).optional().default(""),
-});
+export const searchQuerySchema = z.string().trim().min(1).max(100);
 
-/** Export format. */
-export const exportFormatSchema = z.enum(["csv", "pdf"]);
+export type TaskCreateInput = z.infer<typeof taskCreateSchema>;
+export type TaskUpdateInput = z.infer<typeof taskUpdateSchema>;
+export type StatusUpdateInput = z.infer<typeof statusUpdateSchema>;
+export type SettingsUpdateInput = z.infer<typeof settingsUpdateSchema>;
 
-/** Activity log entry. */
-export const activityLogSchema = z.object({
-  type: z.enum([
-    "TASK_CREATED",
-    "TASK_RENAMED",
-    "TASK_DELETED",
-    "TASK_ARCHIVED",
-    "TASK_UNARCHIVED",
-    "TASK_REORDERED",
-    "TASK_COLOR_CHANGED",
-    "STATUS_CHANGED",
-    "LOGIN",
-    "LOGOUT",
-    "SETTINGS_CHANGED",
-    "NOTE_UPDATED",
-    "ACHIEVEMENT_UNLOCKED",
-  ]),
-  metadata: z.record(z.unknown()).optional(),
-});
-
+/** First human-readable message from a failed parse. */
+export function firstIssue(error: z.ZodError): string {
+  return error.issues[0]?.message ?? "Invalid input";
+}

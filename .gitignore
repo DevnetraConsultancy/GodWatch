@@ -35,3 +35,8 @@ yarn-error.log*
 *.tsbuildinfo
 
 .env*
+
+# Local credentials and tool state (never commit)
+/creds/
+/.freebuff/
+/playwright/.cache
