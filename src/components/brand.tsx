@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { APP_NAME } from "@/lib/constants";
+import { Heart, Mail } from "lucide-react";
+import { APP_CONTACT_EMAIL, APP_FOOTER_COMPANY, APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 /** God Watch mark: a gold eye inside viewfinder brackets ("every day is watched"). */
@@ -30,5 +31,27 @@ export function BrandLink({ href = "/", className }: { href?: string; className?
         {APP_NAME}
       </span>
     </Link>
+  );
+}
+
+/** Company credit line with contact, shared by every footer. */
+export function Credit({ className }: { className?: string }) {
+  return (
+    <span className={cn("inline-flex flex-wrap items-center gap-x-1.5 gap-y-1", className)}>
+      <span className="inline-flex items-center gap-1.5">
+        Invented with
+        <Heart className="size-3.5 fill-[#e3342f] text-[#e3342f]" aria-hidden />
+        <span className="sr-only">love</span>
+        by
+      </span>
+      <span className="whitespace-nowrap font-medium text-fg">{APP_FOOTER_COMPANY}</span>
+      <a
+        className="ml-1 inline-flex items-center gap-1 underline-offset-4 hover:text-fg hover:underline"
+        href={`mailto:${APP_CONTACT_EMAIL}`}
+      >
+        <Mail className="size-3.5" aria-hidden />
+        {APP_CONTACT_EMAIL}
+      </a>
+    </span>
   );
 }

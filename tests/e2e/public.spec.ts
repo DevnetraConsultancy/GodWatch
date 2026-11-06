@@ -6,7 +6,7 @@ test.describe("public pages", () => {
     await page.goto("/");
     await expect(page).toHaveTitle(/God Watch/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Leave evidence");
-    await expect(page.getByText("Invented by Devnetra Consultancy")).toBeVisible();
+    await expect(page.getByText("Devnetra Consultancy", { exact: true })).toBeVisible();
     await page.getByRole("link", { name: "Start tracking free" }).first().click();
     await expect(page).toHaveURL(/\/login/);
   });

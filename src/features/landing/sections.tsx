@@ -15,9 +15,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BrandLink } from "@/components/brand";
+import { BrandLink, Credit } from "@/components/brand";
 import { ProductPreview } from "@/features/landing/product-preview";
-import { APP_CONTACT_EMAIL, APP_FOOTER, APP_NAME, APP_TAGLINE } from "@/lib/constants";
+import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
 
 export function LandingNav() {
   return (
@@ -193,12 +193,7 @@ export function LandingFooter() {
   return (
     <footer className="container-page flex flex-col items-center justify-between gap-4 border-t py-8 text-sm text-fg-muted sm:flex-row">
       <BrandLink />
-      <p>
-        {APP_FOOTER} ·{" "}
-        <a className="underline-offset-4 hover:text-fg hover:underline" href={`mailto:${APP_CONTACT_EMAIL}`}>
-          {APP_CONTACT_EMAIL}
-        </a>
-      </p>
+      <Credit />
     </footer>
   );
 }
