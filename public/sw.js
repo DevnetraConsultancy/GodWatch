@@ -59,10 +59,13 @@ self.addEventListener("fetch", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || "/dashboard";
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
       const open = clients.find((c) => "focus" in c);
-      return open ? open.focus() : self.clients.openWindow("/dashboard");
+      if (!open) return self.clients.openWindow(url);
+      if ("navigate" in open) open.navigate(url).catch(() => {});
+      return open.focus();
     })
   );
 });
@@ -80,7 +83,8 @@ self.addEventListener("push", (event) => {
       body: payload.body,
       icon: "/icons/icon-192.png",
       badge: "/icons/icon-192.png",
-      tag: "habit-start",
+      // Unique per habit, so two habits starting together both show.
+      tag: `habit-start:${payload.title}`,
       data: { url: payload.url },
     })
   );

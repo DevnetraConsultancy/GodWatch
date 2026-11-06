@@ -12,6 +12,18 @@ function base64ToUint8(base64: string): Uint8Array {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 }
 
+/**
+ * The active service worker registration, or null when none activates in
+ * time. `serviceWorker.ready` never settles when registration failed or is
+ * blocked, which would otherwise leave the UI stuck on "busy" forever.
+ */
+function swReady(timeoutMs = 6000): Promise<ServiceWorkerRegistration | null> {
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+  ]);
+}
+
 async function subscribeAndSave(reg: ServiceWorkerRegistration): Promise<boolean> {
   const sub = await reg.pushManager.subscribe({
     userVisibleOnly: true,
@@ -50,8 +62,12 @@ export function usePush() {
       return;
     }
     let cancelled = false;
-    void navigator.serviceWorker.ready
+    void swReady()
       .then(async (reg) => {
+        if (!reg) {
+          if (!cancelled) setState("unsupported");
+          return null;
+        }
         const sub = await reg.pushManager.getSubscription();
         if (sub) return true;
         // Permission granted earlier (perhaps on another visit): register
@@ -59,7 +75,7 @@ export function usePush() {
         if (Notification.permission === "granted") return subscribeAndSave(reg);
         return false;
       })
-      .then((on) => !cancelled && setState(on ? "on" : "off"))
+      .then((on) => on !== null && !cancelled && setState(on ? "on" : "off"))
       .catch(() => !cancelled && setState("off"));
     return () => {
       cancelled = true;
@@ -79,8 +95,8 @@ export function usePush() {
         );
         return;
       }
-      const reg = await navigator.serviceWorker.ready;
-      if (!(await subscribeAndSave(reg))) throw new Error("save failed");
+      const reg = await swReady();
+      if (!reg || !(await subscribeAndSave(reg))) throw new Error("save failed");
       setState("on");
       toast.success("This device will get habit alerts");
     } catch {
@@ -92,8 +108,8 @@ export function usePush() {
   const disable = React.useCallback(async () => {
     setState("busy");
     try {
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
+      const reg = await swReady();
+      const sub = reg ? await reg.pushManager.getSubscription() : null;
       if (sub) {
         await removePushSubscription({ endpoint: sub.endpoint });
         await sub.unsubscribe();

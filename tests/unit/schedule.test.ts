@@ -42,6 +42,8 @@ describe("schedule", () => {
     expect(weekTimesSchema.safeParse({ "1": { start: "08:00", end: "09:00" } }).success).toBe(true);
     expect(weekTimesSchema.safeParse({ "1": { start: "09:00", end: "08:00" } }).success).toBe(false);
     expect(weekTimesSchema.safeParse(null).success).toBe(true);
+    // An empty object means "untimed" and normalises to null.
+    expect(weekTimesSchema.parse({})).toBeNull();
     expect(weekTimesSchema.safeParse({ "7": { start: "08:00", end: "09:00" } }).success).toBe(false);
   });
 });
