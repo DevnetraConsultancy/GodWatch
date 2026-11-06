@@ -21,8 +21,8 @@ import { APP_CONTACT_EMAIL, APP_FOOTER, APP_NAME, APP_TAGLINE } from "@/lib/cons
 
 export function LandingNav() {
   return (
-    <header className="sticky top-0 z-40 px-2 pt-2 sm:px-4 sm:pt-3">
-      <div className="glass container-page flex h-14 items-center justify-between rounded-lg !px-3 sm:!px-4">
+    <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-xl">
+      <div className="container-page flex h-14 items-center justify-between">
         <BrandLink />
         <nav aria-label="Main" className="flex items-center gap-1">
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
