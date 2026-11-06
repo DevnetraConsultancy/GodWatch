@@ -58,7 +58,9 @@ export async function GET(request: NextRequest) {
       const start = minutesOf(window.start);
       if (minutes < start || minutes - start >= WINDOW_MINUTES) continue;
 
-      const key = `${task.id}:${date}`;
+      // The start time is part of the key, so editing a habit's time re-arms
+      // the alert for the new start even on the same day.
+      const key = `${task.id}:${date}:${window.start}`;
       const marked = await prisma.taskStatus.findFirst({
         where: { taskId: task.id, date, NOT: { status: "PENDING" } },
         select: { id: true },
