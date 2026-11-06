@@ -352,8 +352,8 @@ export function GridView(props: GridViewProps) {
 
   return (
     <div className="container-page space-y-3 pt-3">
-      {/* One slim ribbon: title, today's numbers, trends and Add. The grid owns the rest of the screen. */}
-      <div className="glass flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-lg px-4 py-2.5">
+      {/* One slim ribbon: title, today's numbers, trends and Add. No panel around it — it sits straight on the page. */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2.5 py-1">
         <SummaryBar
           heading={
             <div className="leading-tight">
@@ -374,7 +374,7 @@ export function GridView(props: GridViewProps) {
       </div>
 
       {tasks.length === 0 ? (
-        <div className="glass rounded-xl">
+        <div className="border-y border-line">
           <EmptyState
             icon={ListPlus}
             title="Add your first habit"
@@ -399,7 +399,7 @@ export function GridView(props: GridViewProps) {
           />
         </div>
       ) : (
-        <section aria-label="Habit grid" className="glass overflow-hidden rounded-xl">
+        <section aria-label="Habit grid" className="overflow-hidden border-y border-line">
           <div className="scrollbar-thin max-h-[calc(100dvh-312px)] min-h-80 overflow-auto sm:max-h-[calc(100dvh-178px)]">
             <table
               ref={tableRef}

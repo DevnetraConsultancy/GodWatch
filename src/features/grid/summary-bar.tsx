@@ -85,20 +85,24 @@ function MiniBars({ days }: { days: { date: ISODate; rate: number | null }[] }) 
 }
 
 /** Last twelve weeks as a one-glance heat chip; columns are weeks, rows are days. */
-function HeatChip({ days }: { days: { date: ISODate; rate: number | null }[] }) {
+function HeatChip({ days, stretch }: { days: { date: ISODate; rate: number | null }[]; stretch?: boolean }) {
   const weeks: (typeof days)[] = [];
   for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
   return (
-    <div className="flex gap-px" role="img" aria-label={`Completion heatmap of the last ${HEAT_WEEKS} weeks`}>
+    <div
+      className={stretch ? "flex w-full justify-between" : "flex gap-px"}
+      role="img"
+      aria-label={`Completion heatmap of the last ${HEAT_WEEKS} weeks`}
+    >
       {weeks.map((week, i) => (
-        <div key={i} className="flex flex-col gap-px">
+        <div key={i} className={stretch ? "flex flex-col gap-[3px]" : "flex flex-col gap-px"}>
           {week.map((d) => (
             <span
               key={d.date}
               title={`${formatDate(d.date, { month: "short", day: "numeric" })}: ${
                 d.rate === null ? "no habits yet" : `${Math.round(d.rate * 100)}%`
               }`}
-              className="size-[4px] rounded-none"
+              className={stretch ? "size-[7px]" : "size-[4px]"}
               style={{
                 // Perfect days glow gold at full strength; the rest scale in neutral grey.
                 background: d.rate === 1 ? "var(--accent)" : d.rate ? "var(--fg)" : "var(--line)",
@@ -156,15 +160,15 @@ export function SummaryBar({
         </div>
       </div>
 
-      <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-start">
-        <dl className="flex items-center gap-4 sm:gap-5">
-          <Stat icon={Flame} label="Streak" value={`${summary.currentStreak}d`} />
-          <Stat icon={Trophy} label="Best" value={`${summary.longestStreak}d`} />
-          <Stat icon={Target} label="Lifetime" value={`${summary.lifetimeCompletion}%`} />
-        </dl>
-        <div className="sm:hidden">
-          <HeatChip days={series.slice(-8 * 7)} />
-        </div>
+      <dl className="flex items-center gap-4 sm:gap-5">
+        <Stat icon={Flame} label="Streak" value={`${summary.currentStreak}d`} />
+        <Stat icon={Trophy} label="Best" value={`${summary.longestStreak}d`} />
+        <Stat icon={Target} label="Lifetime" value={`${summary.lifetimeCompletion}%`} />
+      </dl>
+
+      {/* On phones the heatmap gets its own full-width, edge-to-edge strip. */}
+      <div className="w-full sm:hidden">
+        <HeatChip days={series} stretch />
       </div>
 
       <div className="hidden items-center gap-4 sm:flex">

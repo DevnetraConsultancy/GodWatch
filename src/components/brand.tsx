@@ -2,33 +2,33 @@ import Link from "next/link";
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-/** God Watch mark: an eye inside a rounded square ("every day is watched"). */
+/** God Watch mark: a gold eye inside viewfinder brackets ("every day is watched"). */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" aria-hidden className={cn("size-8", className)}>
+    <svg viewBox="0 0 180 180" aria-hidden className={cn("size-8", className)}>
       <defs>
-        <linearGradient id="gw-mark" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#161616" />
-          <stop offset="1" stopColor="#000000" />
-        </linearGradient>
         <linearGradient id="gw-gold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#f6dd96" />
-          <stop offset="1" stopColor="#c3902b" />
+          <stop offset="0" stopColor="#F9D56A" />
+          <stop offset="1" stopColor="#D99A22" />
         </linearGradient>
       </defs>
-      <rect width="32" height="32" rx="9" fill="url(#gw-mark)" />
-      <rect x="0.5" y="0.5" width="31" height="31" rx="8.5" fill="none" stroke="url(#gw-gold)" strokeOpacity="0.8" />
-      <path d="M6 16c2.6-4.6 6-7 10-7s7.4 2.4 10 7c-2.6 4.6-6 7-10 7s-7.4-2.4-10-7Z" fill="none" stroke="url(#gw-gold)" strokeWidth="2" strokeLinejoin="round" />
-      <circle cx="16" cy="16" r="3.2" fill="url(#gw-gold)" />
+      <rect x="8" y="8" width="164" height="164" rx="34" fill="#101010" stroke="#3A301B" strokeWidth="2" />
+      <g fill="none" stroke="url(#gw-gold)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M48 58V45Q48 31 63 31H78M98 31H113Q128 31 128 45V58M48 122V135Q48 149 63 149H78M98 149H113Q128 149 128 135V122" />
+        <path d="M31 90Q90 35 149 90Q90 145 31 90Z" strokeWidth="8" />
+      </g>
+      <circle cx="90" cy="90" r="17" fill="url(#gw-gold)" />
     </svg>
   );
 }
 
 export function BrandLink({ href = "/", className }: { href?: string; className?: string }) {
   return (
-    <Link href={href} className={cn("flex items-center gap-2.5 rounded-md", className)} aria-label={`${APP_NAME} home`}>
+    <Link href={href} className={cn("flex items-center gap-2.5", className)} aria-label={`${APP_NAME} home`}>
       <LogoMark />
-      <span className="font-display text-base font-semibold tracking-tight">{APP_NAME}</span>
+      <span className="text-gradient font-display text-lg font-bold tracking-tight [font-variation-settings:'SOFT'_60]">
+        {APP_NAME}
+      </span>
     </Link>
   );
 }

@@ -24,8 +24,8 @@ function useIsActive() {
 export function AppHeader({ user }: { user: { name: string; email: string; image: string | null } }) {
   const isActive = useIsActive();
   return (
-    <header className="sticky top-0 z-40 px-2 pt-2 sm:px-4 sm:pt-3">
-      <div className="glass container-page flex h-14 items-center gap-3 rounded-lg !px-3 sm:!px-4">
+    <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-xl">
+      <div className="container-page flex h-14 items-center gap-3">
         <BrandLink href="/dashboard" />
         <nav aria-label="Main" className="ml-4 hidden items-center gap-1 md:flex">
           {NAV.map((item) => (
@@ -59,7 +59,7 @@ export function MobileNav() {
   return (
     <nav
       aria-label="Main"
-      className="glass-strong fixed inset-x-2 bottom-2 z-40 grid grid-cols-4 rounded-lg p-1 pb-[max(4px,env(safe-area-inset-bottom))] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-line bg-bg/90 p-1 pb-[max(4px,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden"
     >
       {NAV.map((item) => (
         <Link
