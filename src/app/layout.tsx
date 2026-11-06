@@ -28,7 +28,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Devnetra Consultancy" }],
   keywords: ["habit tracker", "daily checklist", "streaks", "consistency", "productivity"],
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg", apple: "/icons/icon-192.png" },
+  icons: {
+    // favicon.ico in src/app is served automatically and listed first,
+    // so browsers that cling to /favicon.ico also get the new logo.
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: "/icons/icon-192.png",
+  },
   appleWebApp: { capable: true, statusBarStyle: "default", title: APP_NAME },
   openGraph: { type: "website", siteName: APP_NAME, title, description: APP_DESCRIPTION, url: "/" },
   twitter: { card: "summary_large_image", title, description: APP_DESCRIPTION },
