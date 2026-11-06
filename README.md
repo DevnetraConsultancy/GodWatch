@@ -61,7 +61,6 @@ npm run dev
 | `npm run check` | Type check, lint, unit tests and build |
 | `npm run db:migrate` | Create a new migration in development |
 | `npm run db:deploy` | Apply migrations (production) |
-| `npm run db:copy-legacy` | One-off copy from the old Supabase database |
 
 Set `E2E_PROD=1` to run the e2e suite against `next start` (run `npm run build` first).
 

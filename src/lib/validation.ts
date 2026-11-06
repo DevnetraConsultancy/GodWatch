@@ -76,7 +76,7 @@ export const noteUpdateSchema = z.object({
   content: z.string().max(10_000, "Notes are limited to 10,000 characters"),
 });
 
-export const reminderTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:mm (24-hour)");
+export const reminderTimeSchema = clockTimeSchema;
 
 export const settingsUpdateSchema = z.object({
   dailyReminderEnabled: z.boolean(),
