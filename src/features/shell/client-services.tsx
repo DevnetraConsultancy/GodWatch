@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { syncTimeZone } from "@/server/actions/account";
-import { ShortcutsDialog } from "@/features/shell/shortcuts-dialog";
 import { SearchDialog } from "@/features/search/search-dialog";
 import { useDailyReminder } from "@/features/reminders/use-daily-reminder";
 
@@ -28,10 +27,5 @@ export function ClientServices({
 
   useDailyReminder(reminder.enabled, reminder.time);
 
-  return (
-    <>
-      <SearchDialog />
-      <ShortcutsDialog />
-    </>
-  );
+  return <SearchDialog />;
 }

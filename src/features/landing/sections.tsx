@@ -7,8 +7,8 @@ import {
   ChevronDown,
   Download,
   Flame,
-  Keyboard,
   MousePointerClick,
+  Search,
   ShieldCheck,
   StickyNote,
   Undo2,
@@ -67,7 +67,7 @@ export function Hero() {
         </div>
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-fg-muted">
           {[
-            { icon: Keyboard, text: "Keyboard-first" },
+            { icon: MousePointerClick, text: "One-tap logging" },
             { icon: ShieldCheck, text: "Private by default" },
             { icon: Download, text: "Export any time" },
           ].map((t) => (
@@ -85,11 +85,11 @@ export function Hero() {
 const FEATURES: { icon: LucideIcon; title: string; text: string }[] = [
   { icon: CalendarRange, title: "Date-first grid", text: "Today on top, every day a row of evidence, months of history one scroll away." },
   { icon: MousePointerClick, title: "One click per day", text: "Click a cell to cycle Pending, Completed, Failed, Missed. It saves instantly." },
-  { icon: Undo2, title: "Undo anything", text: "Marked the wrong cell? Undo from the toast or press Ctrl Z." },
+  { icon: Undo2, title: "Undo anything", text: "Marked the wrong cell? Undo it straight from the toast." },
   { icon: Flame, title: "Fair streaks", text: "A habit only counts from the day you start it, so adding one never rewrites your past." },
   { icon: BarChart3, title: "Real analytics", text: "7, 30 and 365-day rates, a year heatmap, best and toughest months, per-habit breakdowns." },
   { icon: StickyNote, title: "Daily notes", text: "Write what helped or got in the way. Notes autosave and are searchable." },
-  { icon: Keyboard, title: "Keyboard-first", text: "Arrow keys to move, 1 / 2 / 3 / 0 to mark, Ctrl K to search everything." },
+  { icon: Search, title: "Search everything", text: "Find any habit, note or day in one search box." },
   { icon: Bell, title: "Daily reminders", text: "An optional browser notification at the time you choose." },
   { icon: Download, title: "Your data, your files", text: "Export the last year as CSV or a clean PDF report whenever you like." },
 ];

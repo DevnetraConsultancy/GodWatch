@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Keyboard, LogOut, Settings, UserRound } from "lucide-react";
+import { LogOut, Settings, UserRound } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/menu";
 import { signOutUser } from "@/server/actions/account";
-import { openShortcuts } from "@/features/shell/shortcuts-dialog";
 
 export function UserMenu({ user }: { user: { name: string; email: string; image: string | null } }) {
   return (
@@ -38,9 +37,6 @@ export function UserMenu({ user }: { user: { name: string; email: string; image:
           <Link href="/settings">
             <Settings aria-hidden /> Settings
           </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => openShortcuts()}>
-          <Keyboard aria-hidden /> Keyboard shortcuts
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem destructive onSelect={() => void signOutUser()}>
