@@ -4,8 +4,9 @@ export const APP_NAME = "God Watch";
 export const APP_TAGLINE = "Every Day Leaves Evidence.";
 export const APP_DESCRIPTION =
   "A date-first habit tracker and daily checklist. Record whether each task was completed, failed, or missed, and build consistency through streaks and analytics.";
-export const APP_FOOTER = "Invented by Devnetra Consultancy";
-export const APP_CONTACT_EMAIL = "dr.neeconnect@gmail.com";
+export const APP_FOOTER = "Invented with love by Devnetra Consultancy";
+export const APP_FOOTER_COMPANY = "Devnetra Consultancy";
+export const APP_CONTACT_EMAIL = "devnetraconsultancy@gmail.com";
 
 /** Days shown in the grid before "Show earlier days". */
 export const GRID_PAGE_DAYS = 90;
