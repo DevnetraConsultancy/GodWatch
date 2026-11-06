@@ -26,6 +26,9 @@ const tooltipStyle = {
     fontSize: 12,
   },
   labelStyle: { color: "var(--fg-muted)" },
+  // Recharts falls back to black item text when a series has no own color
+  // (bars/pies built from <Cell>), which vanishes in dark mode.
+  itemStyle: { color: "var(--fg)" },
 } as const;
 
 export function TrendChart({ data }: { data: { date: string; rate: number; completed: number; active: number }[] }) {
