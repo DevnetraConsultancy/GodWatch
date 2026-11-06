@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/ui/feedback";
 import { Input, Label } from "@/components/ui/field";
 import { Switch } from "@/components/ui/primitives";
 import { updateSettings } from "@/server/actions/account";
+import { PushCard } from "@/features/settings/push-card";
 import { deleteTask, updateTask } from "@/server/actions/tasks";
 import { TASK_COLORS, TASK_COLOR_NAMES, APP_NAME, type TaskColor } from "@/lib/constants";
 import { formatDate } from "@/lib/dates";
@@ -146,6 +147,8 @@ export function SettingsView({ settings, timeZone, archived: initialArchived, ha
         <h1 className="font-display text-3xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-fg-muted">Preferences, archived habits and your data.</p>
       </div>
+
+      <PushCard />
 
       <Card>
         <CardHeader>

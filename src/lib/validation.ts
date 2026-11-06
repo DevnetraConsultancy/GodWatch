@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TASK_COLORS, type TaskColor } from "@/lib/constants";
 import { isISODate, isValidTimeZone } from "@/lib/dates";
+import { minutesOf } from "@/lib/schedule";
 import { STATUSES } from "@/lib/status";
 
 /**
@@ -31,16 +32,29 @@ export const taskCreateSchema = z.object({
   color: colorSchema.optional(),
 });
 
+export const clockTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:mm (24-hour)");
+
+const timeWindowSchema = z
+  .object({ start: clockTimeSchema, end: clockTimeSchema })
+  .refine((w) => minutesOf(w.end) > minutesOf(w.start), { message: "End must be after start" });
+
+/** Per-weekday windows keyed "0" (Sunday) to "6" (Saturday); null clears all times. */
+export const weekTimesSchema = z
+  .partialRecord(z.enum(["0", "1", "2", "3", "4", "5", "6"]), timeWindowSchema)
+  .nullable();
+
 export const taskUpdateSchema = z
   .object({
     taskId: idSchema,
     name: taskNameSchema.optional(),
     color: colorSchema.optional(),
     archived: z.boolean().optional(),
+    times: weekTimesSchema.optional(),
   })
-  .refine((d) => d.name !== undefined || d.color !== undefined || d.archived !== undefined, {
-    message: "Nothing to update",
-  });
+  .refine(
+    (d) => d.name !== undefined || d.color !== undefined || d.archived !== undefined || d.times !== undefined,
+    { message: "Nothing to update" }
+  );
 
 export const taskDeleteSchema = z.object({ taskId: idSchema });
 

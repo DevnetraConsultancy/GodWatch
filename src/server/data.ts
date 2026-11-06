@@ -12,6 +12,7 @@ import {
 } from "@/lib/stats";
 import { STATUS_LABELS, isStatus } from "@/lib/status";
 import type { AchievementDTO, ActivityDTO, StatusMap, SummaryDTO, TaskDTO } from "@/types/dto";
+import type { WeekTimes } from "@/lib/schedule";
 
 /**
  * Read-side data access. Every query is scoped to the given user id, which
@@ -25,14 +26,21 @@ const taskSelect = {
   order: true,
   startDate: true,
   archivedOn: true,
+  times: true,
 } satisfies Prisma.TaskSelect;
 
+/** The `times` JSON column, as written by the Zod-validated update action. */
+export function asWeekTimes(value: Prisma.JsonValue | null): WeekTimes | null {
+  return (value ?? null) as WeekTimes | null;
+}
+
 export async function getTasks(userId: string, { includeArchived = false } = {}): Promise<TaskDTO[]> {
-  return prisma.task.findMany({
+  const rows = await prisma.task.findMany({
     where: { userId, ...(includeArchived ? {} : { archivedOn: null }) },
     orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     select: taskSelect,
   });
+  return rows.map((t) => ({ ...t, times: asWeekTimes(t.times) }));
 }
 
 async function getCells(userId: string): Promise<Cell[]> {

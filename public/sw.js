@@ -66,3 +66,22 @@ self.addEventListener("notificationclick", (event) => {
     })
   );
 });
+
+/* Habit-start pushes from the server. */
+self.addEventListener("push", (event) => {
+  let payload = { title: "God Watch", body: "", url: "/dashboard" };
+  try {
+    payload = { ...payload, ...event.data.json() };
+  } catch {
+    /* keep defaults */
+  }
+  event.waitUntil(
+    self.registration.showNotification(payload.title, {
+      body: payload.body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: "habit-start",
+      data: { url: payload.url },
+    })
+  );
+});

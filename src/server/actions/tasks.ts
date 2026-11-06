@@ -1,5 +1,6 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/server/db";
 import { logActivity } from "@/server/activity";
 import { runAction, UserFacingError } from "@/server/actions/run";
@@ -11,8 +12,9 @@ import {
   taskUpdateSchema,
 } from "@/lib/validation";
 import type { ActionResult, TaskDTO } from "@/types/dto";
+import { asWeekTimes } from "@/server/data";
 
-const taskSelect = { id: true, name: true, color: true, order: true, startDate: true, archivedOn: true } as const;
+const taskSelect = { id: true, name: true, color: true, order: true, startDate: true, archivedOn: true, times: true } as const;
 
 async function findOwnedTask(userId: string, taskId: string) {
   const task = await prisma.task.findFirst({ where: { id: taskId, userId } });
@@ -38,7 +40,7 @@ export async function createTask(input: unknown): Promise<ActionResult<TaskDTO>>
       select: taskSelect,
     });
     await logActivity(user.id, "TASK_CREATED", { taskId: task.id, name: task.name });
-    return task;
+    return { ...task, times: asWeekTimes(task.times) };
   });
 }
 
@@ -50,7 +52,13 @@ export async function updateTask(input: unknown): Promise<ActionResult<TaskDTO>>
 
     const task = await prisma.task.update({
       where: { id: existing.id },
-      data: { name: data.name, color: data.color, archivedOn },
+      // `times: null` clears every window; Prisma stores JSON null via DbNull.
+      data: {
+        name: data.name,
+        color: data.color,
+        archivedOn,
+        times: data.times === undefined ? undefined : (data.times ?? Prisma.DbNull),
+      },
       select: taskSelect,
     });
 
@@ -63,7 +71,7 @@ export async function updateTask(input: unknown): Promise<ActionResult<TaskDTO>>
     if (archivedOn !== undefined && (archivedOn === null) !== (existing.archivedOn === null)) {
       await logActivity(user.id, archivedOn ? "TASK_ARCHIVED" : "TASK_UNARCHIVED", { taskId: task.id, name: task.name });
     }
-    return task;
+    return { ...task, times: asWeekTimes(task.times) };
   });
 }
 

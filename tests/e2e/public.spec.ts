@@ -61,3 +61,8 @@ test.describe("public pages", () => {
     }
   });
 });
+
+test("push cron endpoint rejects calls without the secret", async ({ request }) => {
+  const res = await request.get("/api/push/cron");
+  expect(res.status()).toBe(401);
+});

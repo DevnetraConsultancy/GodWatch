@@ -75,6 +75,20 @@ test.describe("signed-in app", () => {
     await expect(page.getByRole("option", { name: /morning walk/ })).toBeVisible();
   });
 
+  test("set times for a habit; the window shows under its name", async ({ page, userId }) => {
+    void userId;
+    await page.goto("/dashboard");
+    await addHabit(page, "Gym");
+    await page.getByRole("button", { name: "Options for Gym" }).click();
+    await page.getByRole("menuitem", { name: "Times" }).click();
+    await page.getByRole("switch", { name: "Timed on Monday" }).click();
+    await page.getByRole("button", { name: "Same time every day" }).click();
+    await page.getByRole("button", { name: "Save times" }).click();
+    await expect(page.getByRole("columnheader", { name: /Gym/ })).toContainText("8 AM - 9 AM");
+    await page.reload();
+    await expect(page.getByRole("columnheader", { name: /Gym/ })).toContainText("8 AM - 9 AM");
+  });
+
   test("rename, recolour, archive and restore a habit", async ({ page, userId }) => {
     void userId;
     await page.goto("/dashboard");
@@ -134,7 +148,13 @@ test.describe("signed-in app", () => {
   test("settings save and analytics render", async ({ page, userId }) => {
     void userId;
     await page.goto("/settings");
-    await page.getByRole("radio", { name: "Emerald" }).click();
+    // Retry until hydration has made the radiogroup interactive (a click
+    // before React attaches does nothing), and skip the hidden streamed copy.
+    const emerald = page.locator('[role="radio"][aria-label="Emerald"]:visible');
+    await expect(async () => {
+      await emerald.click();
+      await expect(emerald).toHaveAttribute("aria-checked", "true", { timeout: 2000 });
+    }).toPass();
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByText("Settings saved")).toBeVisible();
 

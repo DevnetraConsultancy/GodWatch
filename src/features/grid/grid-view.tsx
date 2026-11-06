@@ -20,6 +20,7 @@ import { StatusCell } from "@/features/grid/status-cell";
 import { HabitHeader } from "@/features/grid/habit-header";
 import { AddHabit } from "@/features/grid/add-habit";
 import { NotesSheet } from "@/features/grid/notes-sheet";
+import { TimesDialog } from "@/features/grid/times-dialog";
 import { SummaryBar } from "@/features/grid/summary-bar";
 
 interface Change {
@@ -59,6 +60,7 @@ export function GridView(props: GridViewProps) {
   const [focus, setFocus] = React.useState({ row: 0, col: 0 });
   const [noteDate, setNoteDate] = React.useState<ISODate | null>(props.openNote && props.focusDate ? props.focusDate : null);
   const [toDelete, setToDelete] = React.useState<TaskDTO | null>(null);
+  const [timesFor, setTimesFor] = React.useState<TaskDTO | null>(null);
   const [dragFrom, setDragFrom] = React.useState<number | null>(null);
 
   const statusesRef = React.useRef(statuses);
@@ -195,7 +197,7 @@ export function GridView(props: GridViewProps) {
     return true;
   };
 
-  const patchTask = async (task: TaskDTO, patch: Partial<Pick<TaskDTO, "name" | "color">>, label: string) => {
+  const patchTask = async (task: TaskDTO, patch: Partial<Pick<TaskDTO, "name" | "color" | "times">>, label: string) => {
     setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, ...patch } : t)));
     const res = await updateTask({ taskId: task.id, ...patch });
     if (!res.ok) {
@@ -369,12 +371,14 @@ export function GridView(props: GridViewProps) {
                     <HabitHeader
                       key={task.id}
                       task={task}
+                      today={today}
                       index={i}
                       count={tasks.length}
                       dragging={dragFrom === i}
                       onRename={(t, name) => void patchTask(t, { name }, "rename the habit")}
                       onColor={(t, color) => void patchTask(t, { color }, "change the colour")}
                       onMove={moveTask}
+                      onTimes={setTimesFor}
                       onArchive={(t) => void archiveTask(t)}
                       onDelete={setToDelete}
                       onDragStart={onDragStart}
@@ -476,6 +480,12 @@ export function GridView(props: GridViewProps) {
       )}
 
       <NotesSheet date={noteDate} onClose={() => setNoteDate(null)} onSaved={onNoteSaved} />
+      <TimesDialog
+        task={timesFor}
+        tasks={tasks}
+        onClose={() => setTimesFor(null)}
+        onSave={(t, times) => void patchTask(t, { times }, "save the times")}
+      />
       <ConfirmDialog
         open={!!toDelete}
         onOpenChange={(o) => !o && setToDelete(null)}
