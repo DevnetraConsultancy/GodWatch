@@ -73,10 +73,12 @@ function MiniBars({ days }: { days: { date: ISODate; rate: number | null }[] }) 
           }`}
           className="w-[5px]"
           style={{
-            height: d.rate ? `${Math.max(14, d.rate * 100)}%` : "3px",
+            height: d.rate ? `${Math.max(14, d.rate * 100)}%` : d.rate === 0 ? "14%" : "3px",
             opacity: d.rate === null ? 0.4 : 1,
-            // Gold marks a perfect day; partial days stay neutral so gold never dims into brown.
-            background: d.rate === 1 ? "var(--accent)" : d.rate ? "var(--fg-subtle)" : "var(--line)",
+            // Gold marks a perfect day, neutral grey a partial one (never blended
+            // into the gold), and a muted red stub a day where nothing got done.
+            background:
+              d.rate === 1 ? "var(--accent)" : d.rate ? "var(--fg-subtle)" : d.rate === 0 ? "var(--danger-soft)" : "var(--line)",
           }}
         />
       ))}

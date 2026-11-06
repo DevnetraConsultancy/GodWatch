@@ -38,10 +38,13 @@ const timeWindowSchema = z
   .object({ start: clockTimeSchema, end: clockTimeSchema })
   .refine((w) => minutesOf(w.end) > minutesOf(w.start), { message: "End must be after start" });
 
-/** Per-weekday windows keyed "0" (Sunday) to "6" (Saturday); null clears all times. */
+/** Per-weekday windows keyed "0" (Sunday) to "6" (Saturday); null (or no days) clears all times. */
 export const weekTimesSchema = z
   .partialRecord(z.enum(["0", "1", "2", "3", "4", "5", "6"]), timeWindowSchema)
-  .nullable();
+  .nullable()
+  // An empty object is "untimed": store null so the cron's `times IS NOT NULL`
+  // filter never picks up windowless habits.
+  .transform((v) => (v && Object.keys(v).length > 0 ? v : null));
 
 export const taskUpdateSchema = z
   .object({

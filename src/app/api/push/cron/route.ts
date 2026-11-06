@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/server/db";
@@ -29,7 +30,9 @@ function localClock(timeZone: string): { date: ISODate; minutes: number } {
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
   const header = request.headers.get("authorization") ?? "";
-  if (!secret || header !== `Bearer ${secret}`) {
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const given = Buffer.from(header);
+  if (!secret || expected.length !== given.length || !timingSafeEqual(expected, given)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!pushConfigured) return NextResponse.json({ ok: false, reason: "push not configured" });
