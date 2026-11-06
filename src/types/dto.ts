@@ -1,6 +1,7 @@
 import type { ISODate } from "@/lib/dates";
 import type { StatusValue } from "@/lib/status";
 import type { AchievementIcon } from "@/lib/achievements";
+import type { WeekTimes } from "@/lib/schedule";
 
 /** Shapes passed from the server to client components. */
 
@@ -11,6 +12,8 @@ export interface TaskDTO {
   order: number;
   startDate: ISODate;
   archivedOn: ISODate | null;
+  /** Per-weekday time windows; null when the habit is untimed. */
+  times: WeekTimes | null;
 }
 
 /** `taskId -> date -> status` (PENDING cells are absent). */

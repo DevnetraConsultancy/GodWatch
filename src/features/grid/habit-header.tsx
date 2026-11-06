@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Archive, ArrowLeft, ArrowRight, Check, Palette, Pencil, Trash2 } from "lucide-react";
+import { Archive, ArrowLeft, ArrowRight, Check, Clock, Palette, Pencil, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/field";
 import {
   DropdownMenu,
@@ -12,17 +12,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/menu";
 import { TASK_COLORS, TASK_COLOR_NAMES } from "@/lib/constants";
+import { formatWindow, windowFor } from "@/lib/schedule";
 import { cn } from "@/lib/utils";
+import type { ISODate } from "@/lib/dates";
 import type { TaskDTO } from "@/types/dto";
 
 export interface HabitHeaderProps {
   task: TaskDTO;
+  today: ISODate;
   index: number;
   count: number;
   dragging: boolean;
   onRename: (task: TaskDTO, name: string) => void;
   onColor: (task: TaskDTO, color: string) => void;
   onMove: (index: number, to: number) => void;
+  onTimes: (task: TaskDTO) => void;
   onArchive: (task: TaskDTO) => void;
   onDelete: (task: TaskDTO) => void;
   onDragStart: (index: number) => void;
@@ -32,12 +36,14 @@ export interface HabitHeaderProps {
 
 export function HabitHeader({
   task,
+  today,
   index,
   count,
   dragging,
   onRename,
   onColor,
   onMove,
+  onTimes,
   onArchive,
   onDelete,
   onDragStart,
@@ -46,6 +52,7 @@ export function HabitHeader({
 }: HabitHeaderProps) {
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState(task.name);
+  const window = windowFor(task.times, today);
 
   const commit = () => {
     setEditing(false);
@@ -96,8 +103,17 @@ export function HabitHeader({
             aria-label={`Options for ${task.name}`}
             className="flex min-h-10 w-full cursor-grab items-center justify-center gap-1.5 px-1 py-1 text-xs font-semibold transition-colors hover:bg-glass-hover active:cursor-grabbing"
           >
-            <span className="mt-px size-2.5 shrink-0 rounded-full" style={{ backgroundColor: task.color }} aria-hidden />
-            <span className="line-clamp-2 min-w-0 break-words text-left leading-tight">{task.name}</span>
+            <span className="flex min-w-0 items-center gap-1.5">
+              <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: task.color }} aria-hidden />
+              <span className="flex min-w-0 flex-col text-left">
+                <span className="line-clamp-2 break-words leading-tight">{task.name}</span>
+                {window && (
+                  <span className="whitespace-nowrap text-[10px] font-normal leading-tight text-fg-subtle">
+                    {formatWindow(window)}
+                  </span>
+                )}
+              </span>
+            </span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="center" className="w-52">
             <DropdownMenuItem onSelect={() => setEditing(true)}>
@@ -108,6 +124,9 @@ export function HabitHeader({
             </DropdownMenuItem>
             <DropdownMenuItem disabled={index === count - 1} onSelect={() => onMove(index, index + 1)}>
               <ArrowRight aria-hidden /> Move right
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => onTimes(task)}>
+              <Clock aria-hidden /> Times
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="flex items-center gap-2">

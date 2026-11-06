@@ -30,8 +30,9 @@ model User {
   tasks            Task[]
   notes            Note[]
   activityLogs     ActivityLog[]
-  userAchievements UserAchievement[]
-  settings         Settings?
+  userAchievements  UserAchievement[]
+  settings          Settings?
+  pushSubscriptions PushSubscription[]
 }
 
 model Account {
@@ -87,6 +88,8 @@ model Task {
   startDate  String
   /// Day the habit was archived (yyyy-MM-dd); it stops counting from this day. Null while active.
   archivedOn String?
+  /// Optional per-weekday time windows: { "0".."6" (Sun..Sat): { start: "HH:mm", end: "HH:mm" } }.
+  times      Json?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -94,6 +97,28 @@ model Task {
   taskStatuses TaskStatus[]
 
   @@index([userId, archivedOn, order])
+}
+
+/// A device registered for Web Push ("habit starts now" alerts).
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Dedupe marker so each habit-start push is sent once per day.
+model SentPush {
+  key    String   @id
+  sentAt DateTime @default(now())
+
+  @@index([sentAt])
 }
 
 enum Status {
