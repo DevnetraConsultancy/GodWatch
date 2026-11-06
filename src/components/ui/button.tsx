@@ -16,7 +16,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-[image:var(--accent-grad)] text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_6px_16px_-6px_var(--accent)] hover:brightness-105",
+          "bg-[image:var(--accent-grad)] text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_4px_12px_-4px_rgb(0_0_0/0.4)] hover:brightness-105",
         secondary: "glass text-fg hover:bg-glass-hover",
         ghost: "text-fg-muted hover:bg-glass-hover hover:text-fg",
         outline: "border border-line bg-transparent text-fg hover:bg-glass-hover",

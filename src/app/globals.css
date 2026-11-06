@@ -51,9 +51,10 @@
 }
 
 .dark {
-  /* Pure AMOLED black: true #000, neutral glass, gold only on the accents. */
+  /* Pure AMOLED black. Gold is used only at full strength (buttons, text,
+     marks) and never blended into black, which would read as brown. */
   --bg: #000000;
-  --bg-glow-1: rgb(226 184 87 / 0.05);
+  --bg-glow-1: transparent;
   --bg-glow-2: transparent;
   --bg-glow-3: transparent;
   --fg: #f2f1ec;
@@ -63,7 +64,7 @@
   --glass: rgb(255 255 255 / 0.045);
   --glass-strong: rgb(16 16 15 / 0.92);
   --glass-hover: rgb(255 255 255 / 0.09);
-  --glass-border: rgb(230 195 106 / 0.15);
+  --glass-border: rgb(255 255 255 / 0.12);
   --glass-highlight: rgb(255 255 255 / 0.07);
   --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
   --glass-shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 48px -16px rgb(0 0 0 / 0.7);
@@ -71,12 +72,12 @@
   --line: rgb(255 255 255 / 0.1);
   --field: rgb(255 255 255 / 0.055);
 
-  --accent: #e2b857;
-  --accent-hover: #ecca79;
-  --accent-fg: #251903;
-  --accent-grad: linear-gradient(180deg, #f6dd96 0%, #ddae44 48%, #b5831f 100%);
-  --accent-soft: rgb(226 184 87 / 0.14);
-  --accent-text: #e7c368;
+  --accent: #e9bd50;
+  --accent-hover: #f2cd72;
+  --accent-fg: #1c1302;
+  --accent-grad: linear-gradient(180deg, #f8e19c 0%, #eec75e 52%, #dda72e 100%);
+  --accent-soft: rgb(255 255 255 / 0.09);
+  --accent-text: #ecc766;
   --grad-hi: #f6dd96;
   --grad-lo: #cf9c33;
   --ring: #e2b857;
@@ -87,7 +88,7 @@
   --danger-hover: #fca5a5;
   --danger-soft: rgb(248 113 113 / 0.14);
   --warning: #fb923c;
-  --warning-soft: rgb(251 146 60 / 0.15);
+  --warning-soft: rgb(251 146 60 / 0.09);
 
   color-scheme: dark;
 }
@@ -121,10 +122,11 @@
   --font-display: var(--font-fraunces), Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* Square edges across the site: no rounded boxes. (rounded-full stays for dots and rings.) */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
 
   --shadow-glass: var(--glass-shadow);
   --shadow-glass-lg: var(--glass-shadow-lg);
@@ -193,10 +195,9 @@
   }
 }
 
-/* Frosted translucent surface with a soft inner top highlight. */
+/* Frosted translucent surface: a borderless, square-edged panel. */
 @utility glass {
   background-color: var(--glass);
-  border: 1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 0 var(--glass-highlight), var(--glass-shadow);
   /* Smaller blur radius on phones: much cheaper to paint, nearly identical look. */
   backdrop-filter: blur(12px) saturate(160%);
@@ -209,7 +210,6 @@
 
 @utility glass-strong {
   background-color: var(--glass-strong);
-  border: 1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 0 var(--glass-highlight), var(--glass-shadow-lg);
   backdrop-filter: blur(16px) saturate(170%);
   -webkit-backdrop-filter: blur(16px) saturate(170%);
