@@ -50,22 +50,6 @@ test.describe("signed-in app", () => {
     await expect(todayCell(page, "Read")).toHaveAccessibleName(/Completed$/);
   });
 
-  test("keyboard shortcuts mark the focused cell and Ctrl+Z undoes", async ({ page, userId }) => {
-    void userId;
-    await page.goto("/dashboard");
-    await addHabit(page, "Workout");
-    const cell = todayCell(page, "Workout");
-    await cell.focus();
-    await page.keyboard.press("3");
-    await expect(cell).toHaveAccessibleName(/Missed$/);
-    await page.keyboard.press("2");
-    await expect(cell).toHaveAccessibleName(/Failed$/);
-    await page.keyboard.press("Control+z");
-    await expect(cell).toHaveAccessibleName(/Missed$/);
-    await page.keyboard.press("ArrowDown");
-    await expect(page.getByRole("gridcell").getByRole("button").nth(1)).toBeFocused();
-  });
-
   test("first completion unlocks a badge shown on the profile", async ({ page, userId }) => {
     void userId;
     await page.goto("/dashboard");
@@ -86,7 +70,7 @@ test.describe("signed-in app", () => {
     await page.keyboard.press("Escape");
     await expect(page.getByRole("button", { name: /^Open note for / }).first()).toBeVisible();
 
-    await page.keyboard.press("Control+k");
+    await page.getByRole("button", { name: "Search" }).click();
     await page.getByRole("combobox", { name: "Search" }).fill("morning walk");
     await expect(page.getByRole("option", { name: /morning walk/ })).toBeVisible();
   });

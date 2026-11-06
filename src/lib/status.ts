@@ -18,14 +18,6 @@ export const STATUS_MESSAGES: Record<StatusValue, string> = {
   PENDING: "Back to pending. No pressure, just show up.",
 };
 
-/** Keyboard key for each status (1 / 2 / 3 / 0). */
-export const STATUS_KEYS: Record<string, StatusValue> = {
-  "1": "COMPLETED",
-  "2": "FAILED",
-  "3": "MISSED",
-  "0": "PENDING",
-};
-
 /** Next status when a cell is clicked: Pending, Completed, Failed, Missed, Pending... */
 export function nextStatus(current: StatusValue): StatusValue {
   const i = STATUSES.indexOf(current);

@@ -45,16 +45,3 @@ export const TASK_COLOR_NAMES: Record<TaskColor, string> = {
   "#f97316": "Orange",
   "#64748b": "Slate",
 };
-
-export const SHORTCUTS = [
-  { keys: ["1"], label: "Mark focused cell Completed" },
-  { keys: ["2"], label: "Mark focused cell Failed" },
-  { keys: ["3"], label: "Mark focused cell Missed" },
-  { keys: ["0"], label: "Mark focused cell Pending" },
-  { keys: ["Arrow keys"], label: "Move between cells" },
-  { keys: ["Enter"], label: "Cycle focused cell" },
-  { keys: ["N"], label: "Open note for focused day" },
-  { keys: ["Ctrl", "K"], label: "Search" },
-  { keys: ["Ctrl", "Z"], label: "Undo last change" },
-  { keys: ["?"], label: "Show shortcuts" },
-] as const;

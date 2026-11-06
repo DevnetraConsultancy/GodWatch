@@ -4,16 +4,16 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Archive, CalendarPlus, Keyboard, ListPlus, StickyNote } from "lucide-react";
+import { Archive, CalendarPlus, ListPlus, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/dialog";
-import { EmptyState, Kbd } from "@/components/ui/feedback";
+import { EmptyState } from "@/components/ui/feedback";
 import { Tooltip } from "@/components/ui/primitives";
 import { createTask, deleteTask, reorderTasks, updateTask } from "@/server/actions/tasks";
 import { setStatus } from "@/server/actions/entries";
 import { addDays, daysBetween, formatDate, monthKey, formatMonth, type ISODate } from "@/lib/dates";
 import { GRID_PAGE_DAYS, MAX_HISTORY_DAYS } from "@/lib/constants";
-import { STATUS_KEYS, STATUS_LABELS, STATUS_MESSAGES, nextStatus, type StatusValue } from "@/lib/status";
+import { STATUS_LABELS, STATUS_MESSAGES, nextStatus, type StatusValue } from "@/lib/status";
 import { cn } from "@/lib/utils";
 import type { StatusMap, SummaryDTO, TaskDTO } from "@/types/dto";
 import { StatusCell } from "@/features/grid/status-cell";
@@ -21,7 +21,6 @@ import { HabitHeader } from "@/features/grid/habit-header";
 import { AddHabit } from "@/features/grid/add-habit";
 import { NotesSheet } from "@/features/grid/notes-sheet";
 import { SummaryBar } from "@/features/grid/summary-bar";
-import { isTypingTarget, openShortcuts } from "@/features/shell/shortcuts-dialog";
 
 interface Change {
   taskId: string;
@@ -151,18 +150,6 @@ export function GridView(props: GridViewProps) {
     void applyStatus(last.taskId, last.date, last.from, "undo");
   }, [applyStatus]);
 
-  // Ctrl/Cmd+Z anywhere on the page (outside text fields).
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === "z" && !isTypingTarget(e.target)) {
-        e.preventDefault();
-        undo();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [undo]);
-
   // Jump to a date or habit requested by search.
   React.useEffect(() => {
     const row = props.focusDate ? days.indexOf(props.focusDate) : -1;
@@ -179,11 +166,6 @@ export function GridView(props: GridViewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.focusDate, props.focusHabit]);
 
-  const focusCell = React.useCallback((row: number, col: number) => {
-    setFocus({ row, col });
-    tableRef.current?.querySelector<HTMLElement>(`[data-cell="${row}:${col}"]`)?.focus();
-  }, []);
-
   const onFocusCell = React.useCallback((row: number, col: number) => setFocus({ row, col }), []);
 
   const daysRef = React.useRef(days);
@@ -198,39 +180,6 @@ export function GridView(props: GridViewProps) {
     },
     [applyStatus]
   );
-
-  const onGridKeyDown = (e: React.KeyboardEvent) => {
-    if (isTypingTarget(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
-    const target = e.target as HTMLElement;
-    if (!target.dataset.cell) return;
-    const { row, col } = focus;
-    const lastRow = days.length - 1;
-    const lastCol = tasks.length - 1;
-    const moves: Record<string, [number, number]> = {
-      ArrowUp: [Math.max(0, row - 1), col],
-      ArrowDown: [Math.min(lastRow, row + 1), col],
-      ArrowLeft: [row, Math.max(0, col - 1)],
-      ArrowRight: [row, Math.min(lastCol, col + 1)],
-      Home: [row, 0],
-      End: [row, lastCol],
-    };
-    const move = moves[e.key];
-    if (move) {
-      e.preventDefault();
-      focusCell(move[0], move[1]);
-      return;
-    }
-    const status = STATUS_KEYS[e.key];
-    const task = tasks[col];
-    const date = days[row];
-    if (status && task && date) {
-      e.preventDefault();
-      void applyStatus(task.id, date, status);
-    } else if (e.key.toLowerCase() === "n" && date) {
-      e.preventDefault();
-      setNoteDate(date);
-    }
-  };
 
   /* Habit management -------------------------------------------------- */
 
@@ -407,7 +356,6 @@ export function GridView(props: GridViewProps) {
               aria-label="Habits by day. Rows are days, newest first; columns are habits."
               aria-rowcount={days.length + 1}
               className="w-max border-separate border-spacing-0"
-              onKeyDown={onGridKeyDown}
             >
               <thead>
                 <tr>
@@ -515,23 +463,14 @@ export function GridView(props: GridViewProps) {
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 border-t px-4 py-2 text-xs text-fg-muted">
-            <p className="hidden sm:block">
-              Click a cell to cycle Pending, Completed, Failed, Missed. Press <Kbd>1</Kbd> <Kbd>2</Kbd> <Kbd>3</Kbd>{" "}
-              <Kbd>0</Kbd> on a focused cell.
-            </p>
-            <p className="sm:hidden">Tap a cell to cycle its status.</p>
-            <div className="flex items-center gap-1">
-              {archivedCount > 0 && (
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/settings#archived">
-                    <Archive aria-hidden /> {archivedCount} archived
-                  </Link>
-                </Button>
-              )}
-              <Button variant="ghost" size="sm" onClick={openShortcuts}>
-                <Keyboard aria-hidden /> Shortcuts
+            <p>Tap or click a cell to cycle Pending, Completed, Failed, Missed.</p>
+            {archivedCount > 0 && (
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/settings#archived">
+                  <Archive aria-hidden /> {archivedCount} archived
+                </Link>
               </Button>
-            </div>
+            )}
           </div>
         </section>
       )}

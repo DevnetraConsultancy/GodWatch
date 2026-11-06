@@ -6,8 +6,8 @@ Built with Next.js 15 (App Router), React 19, TypeScript (strict), Tailwind CSS 
 
 ## Features
 
-- **Grid**: today on top, 90 days by default with "Show earlier days". One click cycles a cell and saves instantly, with an Undo toast and Ctrl+Z.
-- **Keyboard**: arrow keys move between cells, `1` `2` `3` `0` set a status, `Enter` cycles, `N` opens the day's note, `Ctrl+K` searches, `?` shows all shortcuts.
+- **Grid**: today on top, 90 days by default with "Show earlier days". One tap or click cycles a cell and saves instantly, with an Undo toast.
+- **Touch-first**: everything works with taps and clicks alone; no keyboard shortcuts to learn.
 - **Habits**: add, rename, recolour, reorder (drag or menu), archive and restore, delete with confirmation.
 - **Notes**: one autosaving note per day, searchable.
 - **Analytics**: today / 7 / 30 / 365-day rates, current and longest streak, best and toughest month, 30-day trend, year heatmap, per-habit breakdown.

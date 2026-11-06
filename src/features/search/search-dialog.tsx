@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { CalendarDays, ListChecks, Loader2, Search, StickyNote, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Kbd } from "@/components/ui/feedback";
 import { search } from "@/server/actions/account";
 import { cn } from "@/lib/utils";
 import type { SearchResult } from "@/types/dto";
@@ -22,12 +21,11 @@ export function SearchTrigger() {
     <Button
       variant="ghost"
       onClick={openSearch}
-      aria-label="Search (Ctrl K)"
+      aria-label="Search"
       className="w-10 px-0 sm:w-auto sm:gap-3 sm:px-3"
     >
       <Search aria-hidden />
       <span className="hidden text-fg-subtle lg:inline">Search</span>
-      <Kbd className="hidden lg:inline-flex">Ctrl K</Kbd>
     </Button>
   );
 }
@@ -48,18 +46,8 @@ export function SearchDialog() {
 
   React.useEffect(() => {
     const show = () => setOpen(true);
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setOpen((o) => !o);
-      }
-    };
     window.addEventListener(OPEN_EVENT, show);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener(OPEN_EVENT, show);
-      window.removeEventListener("keydown", onKey);
-    };
+    return () => window.removeEventListener(OPEN_EVENT, show);
   }, []);
 
   React.useEffect(() => {

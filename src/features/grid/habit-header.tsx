@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Archive, ArrowLeft, ArrowRight, Check, MoreHorizontal, Palette, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Archive, ArrowLeft, ArrowRight, Check, Palette, Pencil, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/field";
 import {
   DropdownMenu,
@@ -66,47 +65,41 @@ export function HabitHeader({
       onDragEnter={() => onDragEnter(index)}
       onDragOver={(e) => e.preventDefault()}
       onDragEnd={onDragEnd}
+      // Every column the same width; long names wrap instead of truncating.
       className={cn(
-        "sticky top-0 z-20 w-32 min-w-28 max-w-40 bg-glass-strong p-1 align-bottom backdrop-blur-xl transition-opacity",
+        "sticky top-0 z-20 w-32 min-w-32 max-w-32 bg-glass-strong p-1 align-bottom backdrop-blur-xl transition-opacity",
         dragging && "opacity-40"
       )}
     >
-      <div className="flex h-12 items-center gap-1 rounded-md px-1.5">
-        <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: task.color }} aria-hidden />
-        {editing ? (
-          <Input
-            autoFocus
-            value={draft}
-            maxLength={100}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={commit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") commit();
-              if (e.key === "Escape") {
-                setDraft(task.name);
-                setEditing(false);
-              }
-            }}
-            aria-label={`Rename ${task.name}`}
-            className="h-8 px-2 text-xs"
-          />
-        ) : (
-          <button
-            type="button"
-            onDoubleClick={() => setEditing(true)}
-            title={`${task.name} (double-click to rename, drag to reorder)`}
-            className="min-w-0 flex-1 cursor-grab truncate rounded-sm text-left text-xs font-semibold active:cursor-grabbing"
-          >
-            {task.name}
-          </button>
-        )}
+      {editing ? (
+        <Input
+          autoFocus
+          value={draft}
+          maxLength={100}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit();
+            if (e.key === "Escape") {
+              setDraft(task.name);
+              setEditing(false);
+            }
+          }}
+          aria-label={`Rename ${task.name}`}
+          className="h-9 px-2 text-xs"
+        />
+      ) : (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-sm" className="size-7 shrink-0" aria-label={`Options for ${task.name}`}>
-              <MoreHorizontal />
-            </Button>
+          {/* The habit name itself opens its options: no extra three-dot button. */}
+          <DropdownMenuTrigger
+            title={`${task.name} (tap for options, drag to reorder)`}
+            aria-label={`Options for ${task.name}`}
+            className="flex min-h-10 w-full cursor-grab items-center justify-center gap-1.5 px-1 py-1 text-xs font-semibold transition-colors hover:bg-glass-hover active:cursor-grabbing"
+          >
+            <span className="mt-px size-2.5 shrink-0 rounded-full" style={{ backgroundColor: task.color }} aria-hidden />
+            <span className="line-clamp-2 min-w-0 break-words text-left leading-tight">{task.name}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuContent align="center" className="w-52">
             <DropdownMenuItem onSelect={() => setEditing(true)}>
               <Pencil aria-hidden /> Rename
             </DropdownMenuItem>
@@ -142,7 +135,7 @@ export function HabitHeader({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      )}
     </th>
   );
 }
