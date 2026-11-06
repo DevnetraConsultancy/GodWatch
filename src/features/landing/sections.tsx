@@ -48,7 +48,7 @@ export function Hero() {
         <p className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent-text">
           <ShieldCheck className="size-3.5" aria-hidden /> {APP_TAGLINE}
         </p>
-        <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+        <h1 className="font-display text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
           Track every day. <span className="text-gradient">Leave evidence.</span>
         </h1>
         <p className="max-w-xl text-pretty text-lg leading-relaxed text-fg-muted">
@@ -177,7 +177,7 @@ export function FinalCta() {
   return (
     <section className="container-page py-16 lg:py-24">
       <div className="glass-strong rounded-xl px-6 py-14 text-center">
-        <h2 className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Start leaving evidence today</h2>
+        <h2 className="font-display mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Start leaving evidence today</h2>
         <p className="mx-auto mt-3 max-w-xl text-fg-muted">One click per habit per day. The record does the rest.</p>
         <Button asChild size="lg" className="mt-8">
           <Link href="/login">
@@ -207,7 +207,7 @@ function SectionHeading({ eyebrow, title, text }: { eyebrow: string; title: stri
   return (
     <div className="mx-auto max-w-2xl text-center">
       <p className="text-sm font-medium text-accent-text">{eyebrow}</p>
-      <h2 className="mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h2>
+      <h2 className="font-display mt-2 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h2>
       {text && <p className="mt-3 text-fg-muted">{text}</p>}
     </div>
   );

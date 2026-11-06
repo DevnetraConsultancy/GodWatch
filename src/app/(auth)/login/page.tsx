@@ -39,7 +39,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
       <section className="relative hidden flex-col justify-between overflow-hidden p-10 lg:flex">
         <BrandLink />
         <div className="space-y-6">
-          <p className="max-w-md text-4xl font-semibold leading-tight tracking-tight">
+          <p className="font-display max-w-md text-4xl font-semibold leading-tight tracking-tight">
             Proof beats <span className="text-gradient">motivation.</span>
           </p>
           <p className="max-w-md text-fg-muted">
@@ -80,7 +80,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Search
             <BrandLink />
           </div>
           <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">Sign in to {APP_NAME}</h1>
+            <h1 className="font-display text-2xl font-semibold tracking-tight">Sign in to {APP_NAME}</h1>
             <p className="text-sm text-fg-muted">Use your Google account. No password to remember.</p>
           </div>
           {error && (

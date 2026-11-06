@@ -351,18 +351,27 @@ export function GridView(props: GridViewProps) {
   const canLoadMore = dayCount < MAX_HISTORY_DAYS;
 
   return (
-    <div className="container-page space-y-6 pt-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm text-fg-muted">
-            {formatDate(today, { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight">Today</h1>
-        </div>
-        {tasks.length > 0 && <AddHabit onAdd={addHabit} />}
+    <div className="container-page space-y-3 pt-3">
+      {/* One slim ribbon: title, today's numbers, trends and Add. The grid owns the rest of the screen. */}
+      <div className="glass flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-lg px-4 py-2.5">
+        <SummaryBar
+          heading={
+            <div className="leading-tight">
+              <h1 className="font-display text-xl font-semibold tracking-tight">Today</h1>
+              <p className="whitespace-nowrap text-[11px] text-fg-muted">
+                {formatDate(today, { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+              </p>
+            </div>
+          }
+          summary={summary}
+          todayDone={todayDone}
+          todayActive={tasks.length}
+          tasks={tasks}
+          statuses={statuses}
+          today={today}
+        />
+        {tasks.length > 0 && <AddHabit onAdd={addHabit} className="w-full sm:ms-auto sm:w-auto" />}
       </div>
-
-      <SummaryBar summary={summary} todayDone={todayDone} todayActive={tasks.length} />
 
       {tasks.length === 0 ? (
         <div className="glass rounded-xl">
@@ -391,26 +400,7 @@ export function GridView(props: GridViewProps) {
         </div>
       ) : (
         <section aria-label="Habit grid" className="glass overflow-hidden rounded-xl">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3 text-xs text-fg-muted">
-            <p>
-              Click a cell to cycle Pending, Completed, Failed, Missed. Press <Kbd>1</Kbd> <Kbd>2</Kbd> <Kbd>3</Kbd>{" "}
-              <Kbd>0</Kbd> on a focused cell.
-            </p>
-            <div className="flex items-center gap-1">
-              {archivedCount > 0 && (
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/settings#archived">
-                    <Archive aria-hidden /> {archivedCount} archived
-                  </Link>
-                </Button>
-              )}
-              <Button variant="ghost" size="sm" onClick={openShortcuts}>
-                <Keyboard aria-hidden /> Shortcuts
-              </Button>
-            </div>
-          </div>
-
-          <div className="scrollbar-thin max-h-[calc(100dvh-220px)] min-h-80 overflow-auto">
+          <div className="scrollbar-thin max-h-[calc(100dvh-312px)] min-h-80 overflow-auto sm:max-h-[calc(100dvh-178px)]">
             <table
               ref={tableRef}
               role="grid"
@@ -522,6 +512,25 @@ export function GridView(props: GridViewProps) {
               ) : (
                 <p className="text-xs text-fg-muted">That is as far back as God Watch goes.</p>
               )}
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t px-4 py-2 text-xs text-fg-muted">
+            <p className="hidden sm:block">
+              Click a cell to cycle Pending, Completed, Failed, Missed. Press <Kbd>1</Kbd> <Kbd>2</Kbd> <Kbd>3</Kbd>{" "}
+              <Kbd>0</Kbd> on a focused cell.
+            </p>
+            <p className="sm:hidden">Tap a cell to cycle its status.</p>
+            <div className="flex items-center gap-1">
+              {archivedCount > 0 && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/settings#archived">
+                    <Archive aria-hidden /> {archivedCount} archived
+                  </Link>
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={openShortcuts}>
+                <Keyboard aria-hidden /> Shortcuts
+              </Button>
             </div>
           </div>
         </section>

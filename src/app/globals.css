@@ -4,79 +4,89 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ------------------------------------------------------------------
- * Design tokens. Calm neutral base, one indigo accent, status colours.
+ * Design tokens: "the gold ledger".
+ * Light is a colourful porcelain daylight dial; dark is a warm-black
+ * watch dial with champagne-gold indices. One gold accent in both.
  * All text pairs meet WCAG 2.2 AA (4.5:1) on their surfaces.
  * ------------------------------------------------------------------ */
 :root {
-  --bg: #f3f4f9;
-  --bg-glow-1: rgb(99 102 241 / 0.16);
-  --bg-glow-2: rgb(56 189 248 / 0.12);
-  --fg: #0f172a;
-  --fg-muted: #475569;
-  --fg-subtle: #5f6b7f;
+  --bg: #faf6ee;
+  --bg-glow-1: rgb(244 114 182 / 0.16);
+  --bg-glow-2: rgb(56 189 248 / 0.16);
+  --bg-glow-3: rgb(226 184 87 / 0.2);
+  --fg: #241d10;
+  --fg-muted: #5c5440;
+  --fg-subtle: #6e6550;
 
-  --glass: rgb(255 255 255 / 0.6);
-  --glass-strong: rgb(255 255 255 / 0.82);
-  --glass-hover: rgb(255 255 255 / 0.75);
-  --glass-border: rgb(15 23 42 / 0.08);
+  --glass: rgb(255 253 248 / 0.62);
+  --glass-strong: rgb(255 253 248 / 0.86);
+  --glass-hover: rgb(255 251 240 / 0.8);
+  --glass-border: rgb(146 104 21 / 0.16);
   --glass-highlight: rgb(255 255 255 / 0.9);
-  --glass-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -8px rgb(15 23 42 / 0.12);
-  --glass-shadow-lg: 0 2px 4px rgb(15 23 42 / 0.04), 0 24px 48px -16px rgb(15 23 42 / 0.22);
+  --glass-shadow: 0 1px 2px rgb(63 48 10 / 0.05), 0 8px 24px -8px rgb(63 48 10 / 0.14);
+  --glass-shadow-lg: 0 2px 4px rgb(63 48 10 / 0.05), 0 24px 48px -16px rgb(63 48 10 / 0.24);
 
-  --line: rgb(15 23 42 / 0.08);
-  --field: rgb(255 255 255 / 0.7);
+  --line: rgb(63 48 10 / 0.12);
+  --field: rgb(255 255 255 / 0.72);
 
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-fg: #ffffff;
-  --accent-soft: rgb(99 102 241 / 0.12);
-  --accent-text: #4338ca;
-  --ring: #6366f1;
+  --accent: #a87a16;
+  --accent-hover: #8f6711;
+  --accent-fg: #251903;
+  --accent-grad: linear-gradient(180deg, #f2d78b 0%, #ddb34f 45%, #c3902b 100%);
+  --accent-soft: rgb(180 134 31 / 0.14);
+  --accent-text: #6f4d07;
+  --grad-hi: #a87a16;
+  --grad-lo: #6d4c0a;
+  --ring: #a87a16;
 
   --success: #047857;
   --success-soft: rgb(16 185 129 / 0.14);
   --danger: #b91c1c;
   --danger-hover: #991b1b;
   --danger-soft: rgb(239 68 68 / 0.12);
-  --warning: #b45309;
-  --warning-soft: rgb(245 158 11 / 0.16);
+  --warning: #bc4a08;
+  --warning-soft: rgb(234 88 12 / 0.14);
 
   color-scheme: light;
 }
 
 .dark {
-  --bg: #07080f;
-  --bg-glow-1: rgb(99 102 241 / 0.22);
-  --bg-glow-2: rgb(14 165 233 / 0.1);
-  --fg: #e8eaf3;
-  --fg-muted: #a3a9be;
-  --fg-subtle: #8189a3;
+  --bg: #0a0806;
+  --bg-glow-1: rgb(226 184 87 / 0.13);
+  --bg-glow-2: rgb(221 118 60 / 0.07);
+  --bg-glow-3: rgb(226 184 87 / 0.06);
+  --fg: #f1e9d7;
+  --fg-muted: #b3a88c;
+  --fg-subtle: #978c6f;
 
-  --glass: rgb(22 25 40 / 0.55);
-  --glass-strong: rgb(24 27 44 / 0.85);
-  --glass-hover: rgb(34 38 58 / 0.7);
-  --glass-border: rgb(255 255 255 / 0.08);
-  --glass-highlight: rgb(255 255 255 / 0.07);
+  --glass: rgb(32 27 16 / 0.55);
+  --glass-strong: rgb(32 27 16 / 0.88);
+  --glass-hover: rgb(50 42 25 / 0.65);
+  --glass-border: rgb(230 195 106 / 0.16);
+  --glass-highlight: rgb(255 240 200 / 0.09);
   --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
   --glass-shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 48px -16px rgb(0 0 0 / 0.7);
 
-  --line: rgb(255 255 255 / 0.08);
-  --field: rgb(255 255 255 / 0.04);
+  --line: rgb(230 195 106 / 0.13);
+  --field: rgb(255 240 200 / 0.05);
 
-  --accent: #818cf8;
-  --accent-hover: #a5b4fc;
-  --accent-fg: #0b0d1a;
-  --accent-soft: rgb(129 140 248 / 0.16);
-  --accent-text: #a5b4fc;
-  --ring: #818cf8;
+  --accent: #e2b857;
+  --accent-hover: #ecca79;
+  --accent-fg: #251903;
+  --accent-grad: linear-gradient(180deg, #f6dd96 0%, #ddae44 48%, #b5831f 100%);
+  --accent-soft: rgb(226 184 87 / 0.14);
+  --accent-text: #e7c368;
+  --grad-hi: #f6dd96;
+  --grad-lo: #cf9c33;
+  --ring: #e2b857;
 
   --success: #34d399;
   --success-soft: rgb(52 211 153 / 0.14);
   --danger: #f87171;
   --danger-hover: #fca5a5;
   --danger-soft: rgb(248 113 113 / 0.14);
-  --warning: #fbbf24;
-  --warning-soft: rgb(251 191 36 / 0.14);
+  --warning: #fb923c;
+  --warning-soft: rgb(251 146 60 / 0.15);
 
   color-scheme: dark;
 }
@@ -107,6 +117,7 @@
   --color-warning-soft: var(--warning-soft);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --radius-sm: 8px;
@@ -163,7 +174,8 @@
     pointer-events: none;
     background-image:
       radial-gradient(60rem 40rem at 10% -10%, var(--bg-glow-1), transparent 60%),
-      radial-gradient(50rem 36rem at 100% 0%, var(--bg-glow-2), transparent 60%);
+      radial-gradient(50rem 36rem at 100% 0%, var(--bg-glow-2), transparent 60%),
+      radial-gradient(70rem 50rem at 50% 110%, var(--bg-glow-3), transparent 60%);
   }
 
   :focus-visible {
@@ -216,7 +228,7 @@
 }
 
 @utility text-gradient {
-  background-image: linear-gradient(120deg, var(--accent-text), #38bdf8);
+  background-image: linear-gradient(115deg, var(--grad-hi), var(--grad-lo));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
