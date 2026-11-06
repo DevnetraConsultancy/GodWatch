@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { GridView } from "@/features/grid/grid-view";
+import { PushBanner } from "@/features/push/push-banner";
 import { getDashboardData } from "@/server/data";
 import { requirePageUser } from "@/server/session";
 import { isISODate } from "@/lib/dates";
@@ -18,7 +19,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
   const habit = typeof params.habit === "string" && idSchema.safeParse(params.habit).success ? params.habit : undefined;
 
   return (
-    <GridView
+    <>
+      <PushBanner />
+      <GridView
       // Re-mount when the user's day changes (e.g. after a timezone sync at midnight).
       key={user.today}
       today={user.today}
@@ -29,7 +32,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
       archivedCount={data.archivedCount}
       focusDate={date}
       focusHabit={habit}
-      openNote={params.note === "1"}
-    />
+        openNote={params.note === "1"}
+      />
+    </>
   );
 }
