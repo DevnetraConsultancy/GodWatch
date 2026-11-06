@@ -17,11 +17,13 @@ function level(day: Day): number {
   return 4;
 }
 
+// Only a perfect day earns full gold; partial days scale in neutral tones,
+// so gold is never dimmed into black (which reads as brown).
 const LEVEL_CLASS = [
   "bg-line",
-  "bg-accent/25",
-  "bg-accent/50",
-  "bg-accent/75",
+  "bg-fg/20",
+  "bg-fg/40",
+  "bg-fg/65",
   "bg-accent",
 ];
 
@@ -48,7 +50,7 @@ export function Heatmap({ days }: { days: Day[] }) {
                       day.active === 0 ? "no habits" : `${day.completed}/${day.active} (${day.rate}%)`
                     }`}
                     className={cn(
-                      "size-3 rounded-[3px]",
+                      "size-3 rounded-none",
                       level(day) < 0 ? "bg-transparent ring-1 ring-inset ring-line" : LEVEL_CLASS[level(day)]
                     )}
                   />
@@ -63,7 +65,7 @@ export function Heatmap({ days }: { days: Day[] }) {
       <figcaption className="flex items-center justify-end gap-1.5 text-xs text-fg-muted">
         Less
         {LEVEL_CLASS.map((c) => (
-          <span key={c} className={cn("size-3 rounded-[3px]", c)} aria-hidden />
+          <span key={c} className={cn("size-3 rounded-none", c)} aria-hidden />
         ))}
         More
       </figcaption>

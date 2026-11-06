@@ -10,10 +10,9 @@ const Toaster = dynamic(() => import("sonner").then((m) => m.Toaster), { ssr: fa
 const toastStyle: React.CSSProperties = {
   background: "var(--glass-strong)",
   color: "var(--fg)",
-  border: "1px solid var(--glass-border)",
   boxShadow: "inset 0 1px 0 0 var(--glass-highlight), var(--glass-shadow-lg)",
   backdropFilter: "blur(28px) saturate(170%)",
-  borderRadius: 16,
+  borderRadius: 0,
   fontFamily: "var(--font-sans)",
 };
 

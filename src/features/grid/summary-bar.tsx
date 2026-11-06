@@ -71,11 +71,12 @@ function MiniBars({ days }: { days: { date: ISODate; rate: number | null }[] }) 
           title={`${formatDate(d.date, { weekday: "short", month: "short", day: "numeric" })}: ${
             d.rate === null ? "no habits yet" : `${Math.round(d.rate * 100)}%`
           }`}
-          className="w-[5px] rounded-full"
+          className="w-[5px]"
           style={{
             height: d.rate ? `${Math.max(14, d.rate * 100)}%` : "3px",
             opacity: d.rate === null ? 0.4 : 1,
-            background: d.rate === 1 ? "var(--success)" : d.rate ? "var(--accent)" : "var(--line)",
+            // Gold marks a perfect day; partial days stay neutral so gold never dims into brown.
+            background: d.rate === 1 ? "var(--accent)" : d.rate ? "var(--fg-subtle)" : "var(--line)",
           }}
         />
       ))}
@@ -97,10 +98,11 @@ function HeatChip({ days }: { days: { date: ISODate; rate: number | null }[] }) 
               title={`${formatDate(d.date, { month: "short", day: "numeric" })}: ${
                 d.rate === null ? "no habits yet" : `${Math.round(d.rate * 100)}%`
               }`}
-              className="size-[4px] rounded-[1px]"
+              className="size-[4px] rounded-none"
               style={{
-                background: d.rate ? "var(--accent)" : "var(--line)",
-                opacity: d.rate ? 0.3 + d.rate * 0.7 : 1,
+                // Perfect days glow gold at full strength; the rest scale in neutral grey.
+                background: d.rate === 1 ? "var(--accent)" : d.rate ? "var(--fg)" : "var(--line)",
+                opacity: d.rate === 1 ? 1 : d.rate ? 0.2 + d.rate * 0.45 : 1,
               }}
             />
           ))}

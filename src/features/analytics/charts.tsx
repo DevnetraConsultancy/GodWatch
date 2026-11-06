@@ -20,8 +20,7 @@ const axis = { stroke: "var(--fg-subtle)", fontSize: 12, tickLine: false, axisLi
 const tooltipStyle = {
   contentStyle: {
     background: "var(--glass-strong)",
-    border: "1px solid var(--glass-border)",
-    borderRadius: 12,
+    borderRadius: 0,
     boxShadow: "var(--glass-shadow)",
     color: "var(--fg)",
     fontSize: 12,
@@ -37,7 +36,7 @@ export function TrendChart({ data }: { data: { date: string; rate: number; compl
       <AreaChart data={points} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="trend-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.35} />
+            <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.16} />
             <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
           </linearGradient>
         </defs>
@@ -78,7 +77,7 @@ export function HabitBars({ data }: { data: { name: string; rate: number; color:
         <XAxis type="number" domain={[0, 100]} {...axis} tickFormatter={(v: number) => `${v}%`} />
         <YAxis type="category" dataKey="name" {...axis} width={120} tickFormatter={(n: string) => (n.length > 16 ? `${n.slice(0, 15)}...` : n)} />
         <Tooltip {...tooltipStyle} cursor={{ fill: "var(--glass-hover)" }} formatter={(v: number) => [`${v}%`, "Completion"]} />
-        <Bar dataKey="rate" radius={[0, 6, 6, 0]} isAnimationActive={false}>
+        <Bar dataKey="rate" radius={0} isAnimationActive={false}>
           {data.map((d) => (
             <Cell key={d.name} fill={d.color} />
           ))}
