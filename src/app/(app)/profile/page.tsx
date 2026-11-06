@@ -42,7 +42,7 @@ export default async function ProfilePage() {
       <section className="glass flex flex-col items-start gap-4 rounded-xl p-6 sm:flex-row sm:items-center">
         <Avatar name={user.name} image={user.image} size={72} />
         <div className="min-w-0">
-          <h1 className="truncate text-2xl font-semibold tracking-tight">{user.name}</h1>
+          <h1 className="font-display truncate text-2xl font-semibold tracking-tight">{user.name}</h1>
           <p className="truncate text-sm text-fg-muted">{user.email}</p>
           <p className="mt-1 text-xs text-fg-subtle">
             Member since {joined} · {user.timeZone}

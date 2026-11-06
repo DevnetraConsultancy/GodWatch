@@ -32,7 +32,7 @@ export function AnalyticsView({ stats, trend, heatmap, performance }: Props) {
   if (!hasData) {
     return (
       <div className="container-page pt-6">
-        <h1 className="mb-6 text-3xl font-semibold tracking-tight">Analytics</h1>
+        <h1 className="font-display mb-6 text-3xl font-semibold tracking-tight">Analytics</h1>
         <div className="glass rounded-xl">
           <EmptyState
             icon={BarChart3}
@@ -65,7 +65,7 @@ export function AnalyticsView({ stats, trend, heatmap, performance }: Props) {
   return (
     <div className="container-page space-y-6 pt-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Analytics</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Analytics</h1>
         <p className="mt-1 text-sm text-fg-muted">Your consistency, measured. Rates count only the days each habit was active.</p>
       </div>
 

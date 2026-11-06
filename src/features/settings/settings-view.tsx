@@ -143,7 +143,7 @@ export function SettingsView({ settings, timeZone, archived: initialArchived, ha
   return (
     <div className="container-page max-w-3xl space-y-6 pt-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-fg-muted">Preferences, archived habits and your data.</p>
       </div>
 
