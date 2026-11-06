@@ -51,24 +51,25 @@
 }
 
 .dark {
-  --bg: #0a0806;
-  --bg-glow-1: rgb(226 184 87 / 0.13);
-  --bg-glow-2: rgb(221 118 60 / 0.07);
-  --bg-glow-3: rgb(226 184 87 / 0.06);
-  --fg: #f1e9d7;
-  --fg-muted: #b3a88c;
-  --fg-subtle: #978c6f;
+  /* Pure AMOLED black: true #000, neutral glass, gold only on the accents. */
+  --bg: #000000;
+  --bg-glow-1: rgb(226 184 87 / 0.05);
+  --bg-glow-2: transparent;
+  --bg-glow-3: transparent;
+  --fg: #f2f1ec;
+  --fg-muted: #a8a7a0;
+  --fg-subtle: #8c8b84;
 
-  --glass: rgb(32 27 16 / 0.55);
-  --glass-strong: rgb(32 27 16 / 0.88);
-  --glass-hover: rgb(50 42 25 / 0.65);
-  --glass-border: rgb(230 195 106 / 0.16);
-  --glass-highlight: rgb(255 240 200 / 0.09);
+  --glass: rgb(255 255 255 / 0.045);
+  --glass-strong: rgb(16 16 15 / 0.92);
+  --glass-hover: rgb(255 255 255 / 0.09);
+  --glass-border: rgb(230 195 106 / 0.15);
+  --glass-highlight: rgb(255 255 255 / 0.07);
   --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
   --glass-shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 48px -16px rgb(0 0 0 / 0.7);
 
-  --line: rgb(230 195 106 / 0.13);
-  --field: rgb(255 240 200 / 0.05);
+  --line: rgb(255 255 255 / 0.1);
+  --field: rgb(255 255 255 / 0.055);
 
   --accent: #e2b857;
   --accent-hover: #ecca79;

@@ -8,8 +8,8 @@ export function LogoMark({ className }: { className?: string }) {
     <svg viewBox="0 0 32 32" aria-hidden className={cn("size-8", className)}>
       <defs>
         <linearGradient id="gw-mark" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2b2415" />
-          <stop offset="1" stopColor="#120e07" />
+          <stop offset="0" stopColor="#161616" />
+          <stop offset="1" stopColor="#000000" />
         </linearGradient>
         <linearGradient id="gw-gold" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#f6dd96" />
