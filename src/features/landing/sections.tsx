@@ -1,15 +1,20 @@
 import Link from "next/link";
 import {
+  Archive,
   ArrowRight,
+  Award,
   BarChart3,
   Bell,
+  BellRing,
   CalendarRange,
   ChevronDown,
+  Clock,
   Download,
   Flame,
   MousePointerClick,
   Search,
   ShieldCheck,
+  Smartphone,
   StickyNote,
   Undo2,
   type LucideIcon,
@@ -17,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { BrandLink, Credit } from "@/components/brand";
 import { ProductPreview } from "@/features/landing/product-preview";
+import { ThemeToggle } from "@/features/shell/theme-toggle";
 import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
 
 export function LandingNav() {
@@ -31,6 +37,7 @@ export function LandingNav() {
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <a href="#faq">FAQ</a>
           </Button>
+          <ThemeToggle />
           <Button asChild size="sm">
             <Link href="/login">Sign in</Link>
           </Button>
@@ -86,12 +93,18 @@ const FEATURES: { icon: LucideIcon; title: string; text: string }[] = [
   { icon: CalendarRange, title: "Date-first grid", text: "Today on top, every day a row of evidence, months of history one scroll away." },
   { icon: MousePointerClick, title: "One click per day", text: "Click a cell to cycle Pending, Completed, Failed, Missed. It saves instantly." },
   { icon: Undo2, title: "Undo anything", text: "Marked the wrong cell? Undo it straight from the toast." },
+  { icon: Clock, title: "Habit times", text: "Give a habit a time window for each weekday. It shows under the name, and the next habit can start when the last one ends." },
+  { icon: BellRing, title: "Alerts when a habit starts", text: "Turn on alerts and every device you use gets a notification the moment a timed habit begins." },
+  { icon: Bell, title: "Daily check-in reminder", text: "An optional browser notification at the time you choose, so no day goes unmarked." },
   { icon: Flame, title: "Fair streaks", text: "A habit only counts from the day you start it, so adding one never rewrites your past." },
+  { icon: Award, title: "Badges for the record", text: "Ten achievements, from your first mark to a flawless week and a 500-habit century." },
   { icon: BarChart3, title: "Real analytics", text: "7, 30 and 365-day rates, a year heatmap, best and toughest months, per-habit breakdowns." },
   { icon: StickyNote, title: "Daily notes", text: "Write what helped or got in the way. Notes autosave and are searchable." },
   { icon: Search, title: "Search everything", text: "Find any habit, note or day in one search box." },
-  { icon: Bell, title: "Daily reminders", text: "An optional browser notification at the time you choose." },
-  { icon: Download, title: "Your data, your files", text: "Export the last year as CSV or a clean PDF report whenever you like." },
+  { icon: Archive, title: "Archive, never erase", text: "Retire a habit and its history stays. Restore it from Settings whenever you like." },
+  { icon: Download, title: "Your data, your files", text: "Export the last year as CSV, JSON or a clean PDF report whenever you like." },
+  { icon: Smartphone, title: "Install it anywhere", text: "Add it to your phone or desktop as an app. Nothing private is cached on the device." },
+  { icon: ShieldCheck, title: "Private by default", text: "Sign in with Google. Your data is yours alone and is never shared." },
 ];
 
 export function Features() {
@@ -114,8 +127,8 @@ export function Features() {
 }
 
 const STEPS = [
-  { title: "Add your habits", text: "Each habit becomes a column. Give it a name and a colour." },
-  { title: "Mark the day", text: "Completed, Failed or Missed. Failed means you tried; Missed means the day slipped by." },
+  { title: "Add your habits", text: "Each habit becomes a column. Give it a name, a colour and, if you like, a time for each weekday." },
+  { title: "Mark the day", text: "Completed, Failed or Missed. Failed means you tried; Missed means the day slipped by. Alerts nudge you when a timed habit starts." },
   { title: "Watch evidence compound", text: "Streaks, heatmaps and trends turn your daily marks into long-term proof." },
 ];
 
@@ -146,6 +159,10 @@ const FAQ = [
     a: "Failed means you attempted the habit and it didn't happen. Missed means the day passed without an attempt. Keeping them apart is deliberate: one is feedback, the other is a gap in the record.",
   },
   { q: "What counts as today?", a: "Your own day, midnight to midnight in your timezone, detected from your browser." },
+  {
+    q: "How do habit times and alerts work?",
+    a: "Open a habit's menu and choose Times to set a start and end for any weekday. The window shows under the habit's name on the grid. Turn on alerts and each device you have enabled gets a notification when a timed habit starts. The daily check-in reminder is separate: one browser notification at a time you pick.",
+  },
   {
     q: "Does it work offline?",
     a: "You can install it as an app, but it needs a connection to load and save. Your private data is never stored in the browser cache.",
