@@ -2,6 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 /** Google's "G" mark, as required by its sign-in branding guidelines. */
 function GoogleMark() {
@@ -15,10 +16,10 @@ function GoogleMark() {
   );
 }
 
-export function GoogleButton() {
+export function GoogleButton({ className }: { className?: string }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" variant="secondary" size="lg" className="w-full" loading={pending}>
+    <Button type="submit" variant="secondary" size="lg" className={cn("w-full sm:w-auto", className)} loading={pending}>
       {!pending && <GoogleMark />}
       Continue with Google
     </Button>

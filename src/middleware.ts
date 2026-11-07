@@ -36,7 +36,7 @@ export default auth((req) => {
 
   if (isProtected && !req.auth?.user) {
     const url = req.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/";
     url.search = "";
     url.searchParams.set("callbackUrl", `${pathname}${search}`);
     return NextResponse.redirect(url);

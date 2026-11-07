@@ -68,10 +68,10 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   };
 });
 
-/** For pages: the current user, or a redirect to sign-in. */
+/** For pages: the current user, or a redirect to the landing page, which holds sign-in. */
 export async function requirePageUser(): Promise<CurrentUser> {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/");
   return user;
 }
 

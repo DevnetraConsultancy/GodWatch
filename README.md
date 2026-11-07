@@ -28,7 +28,7 @@ The engine is pure and unit-tested: `src/lib/stats.ts`, `src/lib/dates.ts`.
 
 ```
 src/
-  app/            routes: landing, (auth)/login, (app)/dashboard|analytics|profile|settings, api/
+  app/            routes: landing (with Google sign-in), (app)/dashboard|analytics|profile|settings, api/
   components/ui/  design system (buttons, fields, cards, dialogs, menus, tabs, tooltips, tables, states)
   features/       grid, analytics, profile, settings, search, shell, reminders, landing, pwa
   server/         auth, database, session, rate limiting, data access, server actions (server-only)

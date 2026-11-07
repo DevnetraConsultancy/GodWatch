@@ -14,7 +14,8 @@ export const authConfig = {
     }),
   ],
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
-  pages: { signIn: "/login", error: "/login" },
+  // Sign-in lives on the landing page; Auth.js errors come back there as ?error=.
+  pages: { signIn: "/", error: "/" },
   trustHost: true,
   callbacks: {
     jwt({ token, user }) {
