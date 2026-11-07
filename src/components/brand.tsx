@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export function LogoMark({ className }: { className?: string }) {
   // Plain <img>: the asset is a static SVG, so next/image optimisation has nothing to do.
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src="/logo.svg" alt="" aria-hidden width={512} height={512} className={cn("size-8 shrink-0", className)} />;
+  return <img src="/logo.svg" alt="" aria-hidden width={512} height={320} className={cn("h-7 w-auto shrink-0", className)} />;
 }
 
 export function BrandLink({ href = "/", className }: { href?: string; className?: string }) {

@@ -2,7 +2,7 @@
  * Caches public static assets only. Signed-in pages and API responses are
  * never stored, so nobody can read your data from the cache on a shared device.
  */
-const VERSION = "gw-v3";
+const VERSION = "gw-v4";
 const OFFLINE_URL = "/offline";
 const PRECACHE = [OFFLINE_URL, "/logo.svg", "/icons/icon-192.png", "/manifest.webmanifest"];
 
