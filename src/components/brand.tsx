@@ -29,8 +29,9 @@ export function BrandLink({ href = "/", className }: { href?: string; className?
   return (
     <Link href={href} className={cn("flex items-center gap-2.5", className)} aria-label={`${APP_NAME} home`}>
       <LogoMark />
-      <span className="text-gradient font-display text-lg font-bold tracking-tight [font-variation-settings:'SOFT'_60]">
-        {APP_NAME}
+      {/* Wordmark: "GodWatch" as one word, "God" in the page's foreground (white on dark) and "Watch" in gold. */}
+      <span className="font-display text-lg font-bold tracking-tight text-fg [font-variation-settings:'SOFT'_60]">
+        God<span className="text-gradient">Watch</span>
       </span>
     </Link>
   );
