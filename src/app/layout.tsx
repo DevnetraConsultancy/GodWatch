@@ -32,10 +32,11 @@ export const metadata: Metadata = {
     // favicon.ico in src/app is served automatically and listed first,
     // so browsers that cling to /favicon.ico also get the new logo.
     icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/logo.svg", type: "image/svg+xml" },
       { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512.png", type: "image/png", sizes: "512x512" },
     ],
-    apple: "/icons/icon-192.png",
+    apple: "/apple-touch-icon.png",
   },
   appleWebApp: { capable: true, statusBarStyle: "default", title: APP_NAME },
   openGraph: { type: "website", siteName: APP_NAME, title, description: APP_DESCRIPTION, url: "/" },
