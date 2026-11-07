@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Archive,
   ArrowRight,
@@ -21,6 +20,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandLink, Credit } from "@/components/brand";
+import { GoogleSignIn } from "@/features/auth/google-sign-in";
 import { ProductPreview } from "@/features/landing/product-preview";
 import { ThemeToggle } from "@/features/shell/theme-toggle";
 import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
@@ -38,16 +38,13 @@ export function LandingNav() {
             <a href="#faq">FAQ</a>
           </Button>
           <ThemeToggle />
-          <Button asChild size="sm">
-            <Link href="/login">Sign in</Link>
-          </Button>
         </nav>
       </div>
     </header>
   );
 }
 
-export function Hero() {
+export function Hero({ callbackUrl, error }: { callbackUrl: string; error: string | null }) {
   return (
     <section className="container-page grid items-center gap-12 pb-16 pt-16 sm:pt-24 lg:grid-cols-[1fr_1.15fr] lg:pb-24">
       {/* No entrance animation here: this text is the page's largest paint. */}
@@ -62,16 +59,18 @@ export function Hero() {
           {APP_NAME} is a date-first habit tracker. Record whether each habit was completed, failed or missed, then
           watch honest streaks, heatmaps and trends prove your consistency.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <Button asChild size="lg">
-            <Link href="/login">
-              Start tracking free <ArrowRight aria-hidden />
-            </Link>
-          </Button>
+        {/* Sign-in lives here: there is no separate login page. */}
+        <div className="flex flex-wrap items-start gap-3">
+          <GoogleSignIn callbackUrl={callbackUrl} error={error} />
           <Button asChild size="lg" variant="secondary">
-            <a href="#how-it-works">See how it works</a>
+            <a href="#how-it-works">
+              See how it works <ArrowRight aria-hidden />
+            </a>
           </Button>
         </div>
+        <p className="max-w-md text-xs leading-relaxed text-fg-subtle">
+          Free, no password. We store your Google name, email and photo to run your account; your habits stay private.
+        </p>
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-fg-muted">
           {[
             { icon: MousePointerClick, text: "One-tap logging" },
@@ -190,17 +189,13 @@ export function Faq() {
   );
 }
 
-export function FinalCta() {
+export function FinalCta({ callbackUrl }: { callbackUrl: string }) {
   return (
     <section className="container-page py-16 lg:py-24">
       <div className="glass-strong rounded-xl px-6 py-14 text-center">
         <h2 className="font-display mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl">Start leaving evidence today</h2>
         <p className="mx-auto mt-3 max-w-xl text-fg-muted">One click per habit per day. The record does the rest.</p>
-        <Button asChild size="lg" className="mt-8">
-          <Link href="/login">
-            Start tracking free <ArrowRight aria-hidden />
-          </Link>
-        </Button>
+        <GoogleSignIn callbackUrl={callbackUrl} className="mt-8 flex justify-center" />
       </div>
     </section>
   );
