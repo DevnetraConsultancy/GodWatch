@@ -32,7 +32,6 @@ export const metadata: Metadata = {
     // favicon.ico in src/app is served automatically and listed first,
     // so browsers that cling to /favicon.ico also get the new logo.
     icon: [
-      { url: "/logo.svg", type: "image/svg+xml" },
       { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
       { url: "/icons/icon-512.png", type: "image/png", sizes: "512x512" },
     ],

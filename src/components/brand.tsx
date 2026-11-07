@@ -3,11 +3,26 @@ import { Heart, Mail } from "lucide-react";
 import { APP_CONTACT_EMAIL, APP_FOOTER_COMPANY, APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-/** God Watch mark: the gold eye medallion ("every day is watched"). One vector source for header, favicon and PWA icons. */
+/**
+ * God Watch mark: the gold eye ("every day is watched") in a small black tile
+ * with a gold ring, so it reads the same on light and dark backgrounds.
+ * The same artwork is used for the favicon and PWA icons.
+ */
 export function LogoMark({ className }: { className?: string }) {
-  // Plain <img>: the asset is a static SVG, so next/image optimisation has nothing to do.
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src="/logo.svg" alt="" aria-hidden width={512} height={320} className={cn("h-7 w-auto shrink-0", className)} />;
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "relative inline-flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[22%] bg-black",
+        "ring-1 ring-accent/45 shadow-[0_2px_8px_-2px_rgba(233,189,80,0.45)]",
+        className
+      )}
+    >
+      {/* Plain <img>: a tiny static asset, nothing for next/image to optimise. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/logo-mark.webp" alt="" draggable={false} width={640} height={640} className="h-full w-full select-none object-cover" />
+    </span>
+  );
 }
 
 export function BrandLink({ href = "/", className }: { href?: string; className?: string }) {
