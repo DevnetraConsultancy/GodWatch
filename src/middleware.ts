@@ -57,7 +57,7 @@ export default auth((req) => {
 export const config = {
   matcher: [
     {
-      source: "/((?!api|offline|_next/static|_next/image|favicon.ico|logo.svg|apple-touch-icon.png|icons/|manifest.webmanifest|sw.js|robots.txt|sitemap.xml|opengraph-image).*)",
+      source: "/((?!api|offline|_next/static|_next/image|favicon.ico|brand/|apple-touch-icon.png|icons/|manifest.webmanifest|sw.js|robots.txt|sitemap.xml|opengraph-image).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },
