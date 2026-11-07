@@ -152,7 +152,7 @@ export function HowItWorks() {
 const FAQ = [
   {
     q: `How is ${APP_NAME} different from a to-do list?`,
-    a: "To-do lists are task-first and forget the past. God Watch is date-first: every day is a row and every habit-day cell carries one of four states. That structure is what makes streaks, heatmaps and true completion rates possible.",
+    a: "To-do lists are task-first and forget the past. GodWatch is date-first: every day is a row and every habit-day cell carries one of four states. That structure is what makes streaks, heatmaps and true completion rates possible.",
   },
   {
     q: "What do Failed and Missed mean?",

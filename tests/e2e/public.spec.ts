@@ -4,7 +4,7 @@ import AxeBuilder from "@axe-core/playwright";
 test.describe("public pages", () => {
   test("landing page renders and links to sign-in", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/God Watch/);
+    await expect(page).toHaveTitle(/GodWatch/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Leave evidence");
     await expect(page.getByText("Devnetra Consultancy", { exact: true })).toBeVisible();
     await page.getByRole("link", { name: "Start tracking free" }).first().click();

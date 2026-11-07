@@ -1,5 +1,5 @@
 // ============================================================
-// God Watch — Prisma schema (Neon PostgreSQL)
+// GodWatch — Prisma schema (Neon PostgreSQL)
 // ============================================================
 
 generator client {

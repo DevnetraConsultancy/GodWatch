@@ -93,7 +93,7 @@ export function ProductPreview({ className }: { className?: string }) {
   };
 
   return (
-    <figure className={cn("glass-strong overflow-hidden rounded-xl", className)} aria-label="Example of the God Watch dashboard">
+    <figure className={cn("glass-strong overflow-hidden rounded-xl", className)} aria-label="Example of the GodWatch dashboard">
       {/* Summary ribbon, as on the Today page. */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b px-4 py-3">
         <div className="leading-tight">

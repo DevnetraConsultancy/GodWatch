@@ -4,7 +4,7 @@ import { APP_CONTACT_EMAIL, APP_FOOTER_COMPANY, APP_NAME } from "@/lib/constants
 import { cn } from "@/lib/utils";
 
 /**
- * God Watch mark: the gold eye ("every day is watched") in a small black tile
+ * GodWatch mark: the gold eye ("every day is watched") in a small black tile
  * with a gold ring, so it reads the same on light and dark backgrounds.
  * The same artwork is used for the favicon and PWA icons.
  */

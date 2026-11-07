@@ -462,7 +462,7 @@ export function GridView(props: GridViewProps) {
                   <CalendarPlus aria-hidden /> Show {GRID_PAGE_DAYS} earlier days
                 </Button>
               ) : (
-                <p className="text-xs text-fg-muted">That is as far back as God Watch goes.</p>
+                <p className="text-xs text-fg-muted">That is as far back as GodWatch goes.</p>
               )}
             </div>
           </div>

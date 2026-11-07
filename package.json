@@ -2,7 +2,7 @@
   "name": "god-watch",
   "version": "1.0.0",
   "private": true,
-  "description": "God Watch: Every Day Leaves Evidence. A date-first habit tracker and daily checklist.",
+  "description": "GodWatch: Every Day Leaves Evidence. A date-first habit tracker and daily checklist.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
