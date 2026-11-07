@@ -1,6 +1,6 @@
 {
-  "name": "God Watch",
-  "short_name": "God Watch",
+  "name": "GodWatch",
+  "short_name": "GodWatch",
   "description": "A date-first habit tracker and daily checklist. Every day leaves evidence.",
   "id": "/",
   "start_url": "/dashboard",

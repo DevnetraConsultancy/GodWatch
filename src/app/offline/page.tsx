@@ -14,7 +14,7 @@ export default function OfflinePage() {
         <EmptyState
           icon={WifiOff}
           title="You're offline"
-          description="God Watch needs a connection to load and save your days. Reconnect and refresh this page."
+          description="GodWatch needs a connection to load and save your days. Reconnect and refresh this page."
         />
       </div>
     </main>

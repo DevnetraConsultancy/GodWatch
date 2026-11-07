@@ -1,4 +1,4 @@
-/* God Watch service worker.
+/* GodWatch service worker.
  * Caches public static assets only. Signed-in pages and API responses are
  * never stored, so nobody can read your data from the cache on a shared device.
  */
@@ -72,7 +72,7 @@ self.addEventListener("notificationclick", (event) => {
 
 /* Habit-start pushes from the server. */
 self.addEventListener("push", (event) => {
-  let payload = { title: "God Watch", body: "", url: "/dashboard" };
+  let payload = { title: "GodWatch", body: "", url: "/dashboard" };
   try {
     payload = { ...payload, ...event.data.json() };
   } catch {

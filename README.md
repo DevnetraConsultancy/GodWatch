@@ -1,4 +1,4 @@
-# God Watch
+# GodWatch
 
 **Every Day Leaves Evidence.** A date-first habit tracker: each day is a row, each habit a column, and every cell is Pending, Completed, Failed or Missed.
 

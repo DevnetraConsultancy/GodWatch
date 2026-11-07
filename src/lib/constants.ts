@@ -1,6 +1,6 @@
 /** Brand and product constants. */
 
-export const APP_NAME = "God Watch";
+export const APP_NAME = "GodWatch";
 export const APP_TAGLINE = "Every Day Leaves Evidence.";
 export const APP_DESCRIPTION =
   "A date-first habit tracker and daily checklist. Record whether each task was completed, failed, or missed, and build consistency through streaks and analytics.";
