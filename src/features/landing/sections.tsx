@@ -23,7 +23,7 @@ import { BrandLink, Credit } from "@/components/brand";
 import { GoogleSignIn } from "@/features/auth/google-sign-in";
 import { ProductPreview } from "@/features/landing/product-preview";
 import { ThemeToggle } from "@/features/shell/theme-toggle";
-import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
+import { APP_NAME } from "@/lib/constants";
 
 export function LandingNav() {
   return (
@@ -46,12 +46,9 @@ export function LandingNav() {
 
 export function Hero({ callbackUrl, error }: { callbackUrl: string; error: string | null }) {
   return (
-    <section className="container-page grid items-center gap-12 pb-16 pt-16 sm:pt-24 lg:grid-cols-[1fr_1.15fr] lg:pb-24">
+    <section className="container-page grid items-center gap-10 pb-16 pt-6 sm:pt-10 lg:grid-cols-[1fr_1.15fr] lg:pb-24">
       {/* No entrance animation here: this text is the page's largest paint. */}
       <div className="space-y-6">
-        <p className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent-text">
-          <ShieldCheck className="size-3.5" aria-hidden /> {APP_TAGLINE}
-        </p>
         <h1 className="font-display text-balance text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
           Track every day. <span className="text-gradient">Leave evidence.</span>
         </h1>
