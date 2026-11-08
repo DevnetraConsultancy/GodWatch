@@ -89,6 +89,38 @@ test.describe("signed-in app", () => {
     await expect(page.getByRole("columnheader", { name: /Gym/ })).toContainText("8 AM - 9 AM");
   });
 
+  test("an overnight window saves, and overlapping another habit only warns", async ({ page, userId }) => {
+    void userId;
+    await page.goto("/dashboard");
+    await addHabit(page, "Gym");
+    await addHabit(page, "Sleep");
+    // Gym every day, 5:30 to 6:30 AM.
+    await page.getByRole("button", { name: "Options for Gym" }).click();
+    await page.getByRole("menuitem", { name: "Times" }).click();
+    await page.getByRole("switch", { name: "Timed on Monday" }).click();
+    await page.getByLabel("Monday start").fill("05:30");
+    await page.getByLabel("Monday end").fill("06:30");
+    await page.getByRole("button", { name: "Same time every day" }).click();
+    await page.getByRole("button", { name: "Save times" }).click();
+    await expect(page.getByRole("columnheader", { name: /Gym/ })).toContainText("5:30 AM - 6:30 AM");
+
+    // Sleep every day, 11 PM to 6 AM: runs past midnight and overlaps Gym.
+    await page.getByRole("button", { name: "Options for Sleep" }).click();
+    await page.getByRole("menuitem", { name: "Times" }).click();
+    await page.getByRole("switch", { name: "Timed on Monday" }).click();
+    await page.getByLabel("Monday start").fill("23:00");
+    await page.getByLabel("Monday end").fill("06:00");
+    await expect(page.getByText("next day").first()).toBeVisible();
+    await expect(page.getByRole("status").filter({ hasText: /Overlaps.*Gym/ }).first()).toBeVisible();
+    await page.getByRole("button", { name: "Same time every day" }).click();
+    const save = page.getByRole("button", { name: "Save times" });
+    await expect(save).toBeEnabled();
+    await save.click();
+    await expect(page.getByRole("columnheader", { name: /Sleep/ })).toContainText("11 PM - 6 AM");
+    await page.reload();
+    await expect(page.getByRole("columnheader", { name: /Sleep/ })).toContainText("11 PM - 6 AM");
+  });
+
   test("rename, recolour, archive and restore a habit", async ({ page, userId }) => {
     void userId;
     await page.goto("/dashboard");

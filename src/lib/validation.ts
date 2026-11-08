@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { TASK_COLORS, type TaskColor } from "@/lib/constants";
 import { isISODate, isValidTimeZone } from "@/lib/dates";
-import { minutesOf } from "@/lib/schedule";
 import { STATUSES } from "@/lib/status";
 
 /**
@@ -36,7 +35,9 @@ export const clockTimeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Us
 
 const timeWindowSchema = z
   .object({ start: clockTimeSchema, end: clockTimeSchema })
-  .refine((w) => minutesOf(w.end) > minutesOf(w.start), { message: "End must be after start" });
+  // An end at or before the start means the window runs past midnight
+  // ("23:00" to "06:00"); only an identical start and end is meaningless.
+  .refine((w) => w.start !== w.end, { message: "Start and end can't be the same time" });
 
 /** Per-weekday windows keyed "0" (Sunday) to "6" (Saturday); null (or no days) clears all times. */
 export const weekTimesSchema = z
