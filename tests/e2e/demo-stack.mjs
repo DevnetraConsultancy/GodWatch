@@ -40,12 +40,12 @@ const day = (ago) => {
 };
 
 const habits = [
-  ["t-sleep", "Sleep by 11pm", "#10b981", 90],
-  ["t-run", "Running", "#84cc16", 90],
-  ["t-read", "Reasoning drills", "#6366f1", 60],
-  ["t-aloe", "Alovera", "#22c55e", 60],
-  ["t-ex", "Exercise", "#8b5cf6", 35],
-  ["t-math", "Math", "#14b8a6", 20],
+  ["tsleep", "Sleep by 11pm", "#10b981", 90],
+  ["trun", "Running", "#84cc16", 90],
+  ["tread", "Reasoning drills", "#6366f1", 60],
+  ["taloe", "Alovera", "#22c55e", 60],
+  ["tex", "Exercise", "#8b5cf6", 35],
+  ["tmath", "Math", "#14b8a6", 20],
 ];
 const lines = [
   `INSERT INTO "User" ("id","email","name","emailVerified","createdAt","updatedAt") VALUES ('e2e-user-0','e2e-0@example.test','Test Watcher 0',NOW(),NOW(),NOW());`,
@@ -62,14 +62,14 @@ for (const [id, , , age] of habits) {
     const status = r < 6 ? "COMPLETED" : r < 7 ? "FAILED" : r < 8 ? "MISSED" : null;
     if (status) {
       lines.push(
-        `INSERT INTO "TaskStatus" ("id","taskId","date","status","updatedAt") VALUES ('s-${id}-${ago}','${id}','${day(ago)}','${status}',NOW());`
+        `INSERT INTO "TaskStatus" ("id","taskId","date","status","updatedAt") VALUES ('s${id}${ago}','${id}','${day(ago)}','${status}',NOW());`
       );
     }
   }
   n++;
 }
 lines.push(
-  `INSERT INTO "Note" ("id","userId","date","content","createdAt","updatedAt") VALUES ('n-1','e2e-user-0','${day(1)}','Slept early, easy 5k. Evidence stacking up.',NOW(),NOW());`
+  `INSERT INTO "Note" ("id","userId","date","content","createdAt","updatedAt") VALUES ('n1','e2e-user-0','${day(1)}','Slept early, easy 5k. Evidence stacking up.',NOW(),NOW());`
 );
 
 const sqlFile = join(tmpdir(), `gw-demo-${process.pid}.sql`);
