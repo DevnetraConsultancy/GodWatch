@@ -14,12 +14,20 @@ import type { StatusValue } from "@/lib/status";
  * breaks the current streak while it is still in progress.
  */
 
+/** A stretch of days [from, to) on which a habit was archived before being restored. */
+export interface HabitPause {
+  from: ISODate;
+  to: ISODate;
+}
+
 export interface HabitSpan {
   id: string;
   /** First day the habit counts (user-local date). */
   startDate: ISODate;
   /** Day the habit was archived, or null while active. */
   archivedOn: ISODate | null;
+  /** Earlier archive-and-restore gaps; the habit does not count on those days. */
+  pauses?: HabitPause[] | null;
 }
 
 export interface Cell {
@@ -78,7 +86,8 @@ export function percent(part: number, total: number): number {
 /** True when the habit counts on `date`. */
 export function isActiveOn(habit: HabitSpan, date: ISODate): boolean {
   if (date < habit.startDate) return false;
-  return habit.archivedOn === null || date < habit.archivedOn;
+  if (habit.archivedOn !== null && date >= habit.archivedOn) return false;
+  return !habit.pauses?.some((p) => date >= p.from && date < p.to);
 }
 
 /**
@@ -156,25 +165,37 @@ export function computeStreaks(days: DayScore[]): { currentStreak: number; longe
   return { currentStreak, longestStreak };
 }
 
-function windowRate(days: DayScore[], from: ISODate): Rate {
+/**
+ * Slots a day contributes to a rate. Today is still in progress, so unless
+ * `countUnfinishedToday` is set only the cells already marked count: a habit
+ * you simply have not got to yet must not lower this week's or this month's
+ * rate, while one marked Failed still does.
+ */
+function slotsOf(d: DayScore, today: ISODate, countUnfinishedToday: boolean): number {
+  if (!countUnfinishedToday && d.date === today) return d.completed + d.failed + d.missed;
+  return d.active;
+}
+
+function windowRate(days: DayScore[], from: ISODate, today: ISODate, countUnfinishedToday = false): Rate {
   let completed = 0;
   let slots = 0;
   for (const d of days) {
     if (d.date < from) continue;
     completed += d.completed;
-    slots += d.active;
+    slots += slotsOf(d, today, countUnfinishedToday);
   }
   return { completed, slots, rate: percent(completed, slots) };
 }
 
-function monthExtremes(days: DayScore[]): { best: MonthRate | null; worst: MonthRate | null } {
+function monthExtremes(days: DayScore[], today: ISODate): { best: MonthRate | null; worst: MonthRate | null } {
   const months = new Map<string, { completed: number; slots: number }>();
   for (const d of days) {
-    if (d.active === 0) continue;
+    const slots = slotsOf(d, today, false);
+    if (slots === 0) continue;
     const key = monthKey(d.date);
     const m = months.get(key) ?? { completed: 0, slots: 0 };
     m.completed += d.completed;
-    m.slots += d.active;
+    m.slots += slots;
     months.set(key, m);
   }
   let best: MonthRate | null = null;
@@ -205,7 +226,7 @@ export function computeHabitStats(habits: HabitSpan[], cells: Cell[], today: ISO
     if (isPerfect(d)) perfectDays += 1;
   }
   const checked = completed + failed + missed;
-  const { best, worst } = monthExtremes(days);
+  const { best, worst } = monthExtremes(days, today);
   const todayScore = days.at(-1)?.date === today
     ? days.at(-1)!
     : { date: today, active: 0, completed: 0, failed: 0, missed: 0 };
@@ -218,10 +239,11 @@ export function computeHabitStats(habits: HabitSpan[], cells: Cell[], today: ISO
     totals: { completed, failed, missed, unmarked: slots - checked, checked },
     lifetimeCompletion: percent(completed, checked),
     windows: {
-      daily: windowRate(days, today),
-      weekly: windowRate(days, addDays(today, -6)),
-      monthly: windowRate(days, addDays(today, -29)),
-      yearly: windowRate(days, addDays(today, -364)),
+      // Today's own rate is "done out of everything due today", so it keeps the unfinished slots.
+      daily: windowRate(days, today, today, true),
+      weekly: windowRate(days, addDays(today, -6), today),
+      monthly: windowRate(days, addDays(today, -29), today),
+      yearly: windowRate(days, addDays(today, -364), today),
     },
     bestMonth: best,
     worstMonth: worst,

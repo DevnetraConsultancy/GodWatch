@@ -22,13 +22,15 @@ export default async function DashboardPage({ searchParams }: { searchParams: Se
     <>
       <PushBanner />
       <GridView
-      // Re-mount when the user's day changes (e.g. after a timezone sync at midnight).
-      key={user.today}
+      // Re-mount when the user's day changes (e.g. after a timezone sync at
+      // midnight) and when search asks for a different day, habit or note.
+      key={`${user.today}|${date ?? ""}|${habit ?? ""}|${params.note === "1" ? "n" : ""}`}
       today={user.today}
       tasks={data.tasks}
       statuses={data.statuses}
       noteDates={data.noteDates}
       summary={data.summary}
+      dayRates={data.dayRates}
       archivedCount={data.archivedCount}
       focusDate={date}
       focusHabit={habit}

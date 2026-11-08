@@ -107,8 +107,9 @@ describe("computeHabitStats", () => {
     expect(s.windows.daily.rate).toBe(50);
   });
 
-  it("uses active slots for window rates", () => {
-    expect(s.windows.weekly).toEqual({ completed: 2, slots: 4, rate: 50 });
+  it("counts active slots for window rates, except today's unmarked ones", () => {
+    // Four active slots this week, but b has not been marked today yet.
+    expect(s.windows.weekly).toEqual({ completed: 2, slots: 3, rate: 67 });
   });
 
   it("finds best and worst month by completion rate", () => {
@@ -118,7 +119,47 @@ describe("computeHabitStats", () => {
       TODAY
     );
     expect(multi.bestMonth).toEqual({ month: "2025-02", rate: 100 });
-    expect(multi.worstMonth).toEqual({ month: "2025-03", rate: 10 });
+    // March has ten days up to today, but today's unmarked slot is not held against you yet.
+    expect(multi.worstMonth).toEqual({ month: "2025-03", rate: 11 });
+  });
+
+  it("does not let an unfinished today lower the window or month rates", () => {
+    const flawless = computeHabitStats(
+      [habit("a", "2025-03-08"), habit("b", "2025-03-08")],
+      [done("a", "2025-03-08"), done("b", "2025-03-08"), done("a", "2025-03-09"), done("b", "2025-03-09"), done("a", TODAY)],
+      TODAY
+    );
+    // b is simply not done yet today: 5 of 5 marked cells are complete.
+    expect(flawless.windows.weekly).toEqual({ completed: 5, slots: 5, rate: 100 });
+    expect(flawless.worstMonth).toEqual({ month: "2025-03", rate: 100 });
+    // Today's own rate still counts everything due today.
+    expect(flawless.windows.daily).toEqual({ completed: 1, slots: 2, rate: 50 });
+
+    // A Failed today does count against the rate.
+    const failed = computeHabitStats(
+      [habit("a", "2025-03-09")],
+      [done("a", "2025-03-09"), { taskId: "a", date: TODAY, status: "FAILED" }],
+      TODAY
+    );
+    expect(failed.windows.weekly).toEqual({ completed: 1, slots: 2, rate: 50 });
+  });
+
+  it("keeps archive-and-restore gaps out of the record", () => {
+    // a ran 03-01..03-05, was archived on 03-06 and restored on 03-10 (today).
+    const a: HabitSpan = { id: "a", startDate: "2025-03-01", archivedOn: null, pauses: [{ from: "2025-03-06", to: TODAY }] };
+    const b = habit("b", "2025-03-06");
+    const cells = [
+      ...["01", "02", "03", "04", "05"].map((d) => done("a", `2025-03-${d}`)),
+      ...["06", "07", "08", "09"].map((d) => done("b", `2025-03-${d}`)),
+    ];
+    const s = computeHabitStats([a, b], cells, TODAY);
+    // Nine perfect days in a row; the gap never adds an unmarked slot for a.
+    expect(s.longestStreak).toBe(9);
+    expect(s.currentStreak).toBe(9);
+    expect(s.totals.unmarked).toBe(2); // only today's two pending cells
+    expect(scoreDays([a, b], cells, TODAY).find((d) => d.date === "2025-03-07")).toMatchObject({ active: 1, completed: 1 });
+    // On the restore day the habit counts again.
+    expect(scoreDays([a, b], cells, TODAY).at(-1)).toMatchObject({ date: TODAY, active: 2 });
   });
 
   it("returns an empty today when there are no habits", () => {

@@ -8,16 +8,20 @@ import {
   computeTaskPerformance,
   dailySeries,
   type Cell,
+  type HabitPause,
   type HabitStats,
 } from "@/lib/stats";
 import { STATUS_LABELS, isStatus } from "@/lib/status";
-import type { AchievementDTO, ActivityDTO, StatusMap, SummaryDTO, TaskDTO } from "@/types/dto";
+import type { AchievementDTO, ActivityDTO, DayRate, StatusMap, SummaryDTO, TaskDTO } from "@/types/dto";
 import type { WeekTimes } from "@/lib/schedule";
 
 /**
  * Read-side data access. Every query is scoped to the given user id, which
  * callers must take from the verified session, never from client input.
  */
+
+/** Twelve weeks: the dashboard's heat chip, of which the sparkline shows the last two. */
+export const DASHBOARD_SPARKLINE_DAYS = 84;
 
 const taskSelect = {
   id: true,
@@ -27,11 +31,24 @@ const taskSelect = {
   startDate: true,
   archivedOn: true,
   times: true,
+  pauses: true,
 } satisfies Prisma.TaskSelect;
 
 /** The `times` JSON column, as written by the Zod-validated update action. */
 export function asWeekTimes(value: Prisma.JsonValue | null): WeekTimes | null {
   return (value ?? null) as WeekTimes | null;
+}
+
+/** The `pauses` JSON column, written only by the unarchive path in `updateTask`. */
+export function asPauses(value: Prisma.JsonValue | null): HabitPause[] | null {
+  return Array.isArray(value) && value.length > 0 ? (value as unknown as HabitPause[]) : null;
+}
+
+/** Map a selected task row to its DTO. */
+export function toTaskDTO<T extends { times: Prisma.JsonValue | null; pauses: Prisma.JsonValue | null }>(
+  row: T
+): Omit<T, "times" | "pauses"> & { times: WeekTimes | null; pauses: HabitPause[] | null } {
+  return { ...row, times: asWeekTimes(row.times), pauses: asPauses(row.pauses) };
 }
 
 export async function getTasks(userId: string, { includeArchived = false } = {}): Promise<TaskDTO[]> {
@@ -40,7 +57,7 @@ export async function getTasks(userId: string, { includeArchived = false } = {})
     orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     select: taskSelect,
   });
-  return rows.map((t) => ({ ...t, times: asWeekTimes(t.times) }));
+  return rows.map(toTaskDTO);
 }
 
 async function getCells(userId: string): Promise<Cell[]> {
@@ -89,6 +106,12 @@ export async function getDashboardData(userId: string, today: ISODate) {
     statuses: toStatusMap(cells, new Set(active.map((t) => t.id))),
     noteDates: notes.map((n) => n.date),
     summary: toSummary(computeHabitStats(tasks, cells, today)),
+    // Scored by the same engine as the streaks, so archived habits and
+    // back-filled days count exactly as they do everywhere else.
+    dayRates: dailySeries(tasks, cells, today, DASHBOARD_SPARKLINE_DAYS).map<DayRate>((d) => ({
+      date: d.date,
+      rate: d.active > 0 ? d.completed / d.active : null,
+    })),
     archivedCount: tasks.length - active.length,
   };
 }

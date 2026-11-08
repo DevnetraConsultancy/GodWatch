@@ -12,9 +12,9 @@ import {
   taskUpdateSchema,
 } from "@/lib/validation";
 import type { ActionResult, TaskDTO } from "@/types/dto";
-import { asWeekTimes } from "@/server/data";
+import { asPauses, toTaskDTO } from "@/server/data";
 
-const taskSelect = { id: true, name: true, color: true, order: true, startDate: true, archivedOn: true, times: true } as const;
+const taskSelect = { id: true, name: true, color: true, order: true, startDate: true, archivedOn: true, times: true, pauses: true } as const;
 
 async function findOwnedTask(userId: string, taskId: string) {
   const task = await prisma.task.findFirst({ where: { id: taskId, userId } });
@@ -40,7 +40,7 @@ export async function createTask(input: unknown): Promise<ActionResult<TaskDTO>>
       select: taskSelect,
     });
     await logActivity(user.id, "TASK_CREATED", { taskId: task.id, name: task.name });
-    return { ...task, times: asWeekTimes(task.times) };
+    return toTaskDTO(task);
   });
 }
 
@@ -49,6 +49,23 @@ export async function updateTask(input: unknown): Promise<ActionResult<TaskDTO>>
     const existing = await findOwnedTask(user.id, data.taskId);
     const archivedOn =
       data.archived === undefined ? undefined : data.archived ? (existing.archivedOn ?? user.today) : null;
+    const restoring = archivedOn === null && existing.archivedOn !== null;
+
+    let pauses: Prisma.InputJsonValue | undefined;
+    if (restoring) {
+      // Restoring counts as adding the habit back, so it obeys the same cap...
+      const activeCount = await prisma.task.count({ where: { userId: user.id, archivedOn: null } });
+      if (activeCount >= MAX_ACTIVE_TASKS) {
+        throw new UserFacingError(`You can track up to ${MAX_ACTIVE_TASKS} active habits. Archive one to restore this.`);
+      }
+      // ...and the days it sat archived stay out of the record, so past streaks do not change.
+      if (existing.archivedOn! < user.today) {
+        pauses = [...(asPauses(existing.pauses) ?? []), { from: existing.archivedOn!, to: user.today }].map((p) => ({
+          from: p.from,
+          to: p.to,
+        }));
+      }
+    }
 
     const task = await prisma.task.update({
       where: { id: existing.id },
@@ -57,6 +74,7 @@ export async function updateTask(input: unknown): Promise<ActionResult<TaskDTO>>
         name: data.name,
         color: data.color,
         archivedOn,
+        pauses,
         times: data.times === undefined ? undefined : (data.times ?? Prisma.DbNull),
       },
       select: taskSelect,
@@ -71,7 +89,7 @@ export async function updateTask(input: unknown): Promise<ActionResult<TaskDTO>>
     if (archivedOn !== undefined && (archivedOn === null) !== (existing.archivedOn === null)) {
       await logActivity(user.id, archivedOn ? "TASK_ARCHIVED" : "TASK_UNARCHIVED", { taskId: task.id, name: task.name });
     }
-    return { ...task, times: asWeekTimes(task.times) };
+    return toTaskDTO(task);
   });
 }
 

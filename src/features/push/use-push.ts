@@ -24,11 +24,13 @@ function swReady(timeoutMs = 6000): Promise<ServiceWorkerRegistration | null> {
   ]);
 }
 
-async function subscribeAndSave(reg: ServiceWorkerRegistration): Promise<boolean> {
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: base64ToUint8(VAPID_PUBLIC_KEY!) as BufferSource,
-  });
+async function subscribeAndSave(reg: ServiceWorkerRegistration, existing?: PushSubscription): Promise<boolean> {
+  const sub =
+    existing ??
+    (await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: base64ToUint8(VAPID_PUBLIC_KEY!) as BufferSource,
+    }));
   const json = sub.toJSON();
   const res = await savePushSubscription({
     endpoint: sub.endpoint,
@@ -69,7 +71,9 @@ export function usePush() {
           return null;
         }
         const sub = await reg.pushManager.getSubscription();
-        if (sub) return true;
+        // Re-save an existing subscription: on a shared device it may still
+        // belong to whoever signed in before, and alerts go to the row's owner.
+        if (sub) return subscribeAndSave(reg, sub);
         // Permission granted earlier (perhaps on another visit): register
         // this device without any prompt.
         if (Notification.permission === "granted") return subscribeAndSave(reg);
