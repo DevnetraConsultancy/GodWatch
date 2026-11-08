@@ -56,6 +56,45 @@ export function formatWindow(window: TimeWindow): string {
   return `${formatTime(window.start)} - ${formatTime(window.end)}`;
 }
 
+/** True when the window runs past midnight, like "23:00" to "06:00". */
+export function isOvernight(window: TimeWindow): boolean {
+  return minutesOf(window.end) <= minutesOf(window.start);
+}
+
+/** Length in minutes. An overnight window wraps into the next day. */
+export function durationMinutes(window: TimeWindow): number {
+  const diff = minutesOf(window.end) - minutesOf(window.start);
+  return diff > 0 ? diff : diff + 24 * 60;
+}
+
+/**
+ * The minutes of one day a window occupies. An overnight window is treated
+ * as covering both its evening part and its early-morning part on the same
+ * weekday, which is how people read "Sleep, 11 PM to 6 AM, every day".
+ */
+function dayIntervals(window: TimeWindow): [number, number][] {
+  const start = minutesOf(window.start);
+  const end = minutesOf(window.end);
+  return end > start ? [[start, end]] : [[start, 24 * 60], [0, end]];
+}
+
+/** Do two windows on the same weekday share any minute? */
+export function windowsOverlap(a: TimeWindow, b: TimeWindow): boolean {
+  return dayIntervals(a).some(([s1, e1]) => dayIntervals(b).some(([s2, e2]) => s1 < e2 && s2 < e1));
+}
+
+/** Names of the other habits whose window on `weekday` overlaps `window`. Overlap is allowed; this only warns. */
+export function overlappingHabits<T extends { name: string; times: WeekTimes | null | undefined }>(
+  window: TimeWindow,
+  weekday: WeekdayKey,
+  others: T[]
+): T[] {
+  return others.filter((t) => {
+    const other = t.times?.[weekday];
+    return other ? windowsOverlap(window, other) : false;
+  });
+}
+
 /**
  * Suggested start for a habit's window on one weekday: the end of the
  * closest earlier habit (by column order) that has a window that day.
