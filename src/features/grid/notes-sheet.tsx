@@ -28,11 +28,15 @@ export function NotesSheet({
   const [save, setSave] = React.useState<SaveState>("idle");
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const pending = React.useRef<{ date: string; content: string } | null>(null);
+  const loadSeq = React.useRef(0);
 
   const load = React.useCallback(async (d: string) => {
+    const seq = ++loadSeq.current;
     setLoading(true);
     setLoadError(null);
     const res = await getNote({ date: d });
+    // A slower response for a day that is no longer open must not land here.
+    if (seq !== loadSeq.current) return;
     setLoading(false);
     if (res.ok) setContent(res.data.content);
     else setLoadError(res.error);

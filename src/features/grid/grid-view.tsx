@@ -11,11 +11,11 @@ import { EmptyState } from "@/components/ui/feedback";
 import { Tooltip } from "@/components/ui/primitives";
 import { createTask, deleteTask, reorderTasks, updateTask } from "@/server/actions/tasks";
 import { setStatus } from "@/server/actions/entries";
-import { addDays, daysBetween, formatDate, monthKey, formatMonth, type ISODate } from "@/lib/dates";
+import { addDays, dateInZone, daysBetween, formatDate, monthKey, formatMonth, type ISODate } from "@/lib/dates";
 import { GRID_PAGE_DAYS, MAX_HISTORY_DAYS } from "@/lib/constants";
 import { STATUS_LABELS, STATUS_MESSAGES, nextStatus, type StatusValue } from "@/lib/status";
 import { cn } from "@/lib/utils";
-import type { StatusMap, SummaryDTO, TaskDTO } from "@/types/dto";
+import type { DayRate, StatusMap, SummaryDTO, TaskDTO } from "@/types/dto";
 import { StatusCell } from "@/features/grid/status-cell";
 import { HabitHeader } from "@/features/grid/habit-header";
 import { AddHabit } from "@/features/grid/add-habit";
@@ -40,6 +40,7 @@ export interface GridViewProps {
   statuses: StatusMap;
   noteDates: ISODate[];
   summary: SummaryDTO;
+  dayRates: DayRate[];
   archivedCount: number;
   focusDate?: ISODate;
   focusHabit?: string;
@@ -47,7 +48,7 @@ export interface GridViewProps {
 }
 
 export function GridView(props: GridViewProps) {
-  const { today, summary, archivedCount } = props;
+  const { today, summary, dayRates, archivedCount } = props;
   const router = useRouter();
 
   const [tasks, setTasks] = React.useState(props.tasks);
@@ -62,11 +63,14 @@ export function GridView(props: GridViewProps) {
   const [toDelete, setToDelete] = React.useState<TaskDTO | null>(null);
   const [timesFor, setTimesFor] = React.useState<TaskDTO | null>(null);
   const [dragFrom, setDragFrom] = React.useState<number | null>(null);
+  const [adding, setAdding] = React.useState(false);
 
   const statusesRef = React.useRef(statuses);
   statusesRef.current = statuses;
   const undoStack = React.useRef<Change[]>([]);
   const latestRequest = React.useRef(new Map<string, number>());
+  /** What the server last confirmed for a cell with saves in flight, so a failed chain rolls back to the truth. */
+  const confirmedBase = React.useRef(new Map<string, StatusValue>());
   const requestSeq = React.useRef(0);
   const refreshTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const tableRef = React.useRef<HTMLTableElement>(null);
@@ -99,6 +103,7 @@ export function GridView(props: GridViewProps) {
       const key = `${taskId}:${date}`;
       const seq = ++requestSeq.current;
       latestRequest.current.set(key, seq);
+      if (!confirmedBase.current.has(key)) confirmedBase.current.set(key, from);
       writeCell(taskId, date, to);
 
       const change: Change = { taskId, date, from, to };
@@ -108,8 +113,14 @@ export function GridView(props: GridViewProps) {
       }
 
       const res = await setStatus({ taskId, date, status: to });
+      const latest = latestRequest.current.get(key) === seq;
       if (!res.ok) {
-        if (latestRequest.current.get(key) === seq) writeCell(taskId, date, from);
+        // Two quick clicks that both fail must land on what the server has,
+        // not on the first click's optimistic value.
+        if (latest) {
+          writeCell(taskId, date, confirmedBase.current.get(key) ?? from);
+          confirmedBase.current.delete(key);
+        }
         undoStack.current = undoStack.current.filter((c) => c !== change);
         toast.error("Couldn't save that change", {
           id: STATUS_TOAST_ID,
@@ -119,6 +130,7 @@ export function GridView(props: GridViewProps) {
         return;
       }
 
+      if (latest) confirmedBase.current.delete(key);
       const taskName = tasksRef.current.find((t) => t.id === taskId)?.name ?? "Habit";
       if (mode === "undo") {
         toast("Change undone", { id: `${STATUS_TOAST_ID}-undo`, description: `${taskName} is back to ${STATUS_LABELS[to].toLowerCase()}.` });
@@ -126,7 +138,7 @@ export function GridView(props: GridViewProps) {
         toast(`${taskName}: ${STATUS_LABELS[to]}`, {
           id: STATUS_TOAST_ID,
           description: `${formatDate(date, { weekday: "short", month: "short", day: "numeric" })}. ${STATUS_MESSAGES[to]}`,
-          action: { label: "Undo", onClick: () => void undo() },
+          action: { label: "Undo", onClick: () => void undo(change) },
           duration: 8000,
         });
       }
@@ -143,14 +155,63 @@ export function GridView(props: GridViewProps) {
   const tasksRef = React.useRef(tasks);
   tasksRef.current = tasks;
 
-  const undo = React.useCallback(() => {
-    const last = undoStack.current.pop();
-    if (!last) {
-      toast("Nothing to undo", { id: STATUS_TOAST_ID });
-      return;
-    }
-    void applyStatus(last.taskId, last.date, last.from, "undo");
-  }, [applyStatus]);
+  /** Undo one specific change (the one a toast names), or the most recent one. */
+  const undo = React.useCallback(
+    (target?: Change) => {
+      const stack = undoStack.current;
+      const index = target ? stack.lastIndexOf(target) : stack.length - 1;
+      if (index < 0) {
+        toast(target ? "That change was already undone" : "Nothing to undo", { id: STATUS_TOAST_ID });
+        return;
+      }
+      const [change] = stack.splice(index, 1);
+      void applyStatus(change!.taskId, change!.date, change!.from, "undo");
+    },
+    [applyStatus]
+  );
+
+  // Keep a real tab stop inside the grid when the focused column disappears (archive, delete).
+  React.useEffect(() => {
+    setFocus((f) => (tasks.length > 0 && f.col >= tasks.length ? { ...f, col: tasks.length - 1 } : f));
+  }, [tasks.length]);
+
+  // The day can roll over while the tab stays open: once the browser's date
+  // moves past `today`, re-fetch so the "Today" row is really today.
+  React.useEffect(() => {
+    const check = () => {
+      const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (zone && dateInZone(new Date(), zone) > today) router.refresh();
+    };
+    const timer = setInterval(check, 60_000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [today, router]);
+
+  /** Arrow keys walk the grid; Home/End jump to the first and last habit. */
+  const onGridKeyDown = (e: React.KeyboardEvent<HTMLTableElement>) => {
+    const moves: Record<string, [number, number]> = {
+      ArrowUp: [-1, 0],
+      ArrowDown: [1, 0],
+      ArrowLeft: [0, -1],
+      ArrowRight: [0, 1],
+    };
+    let next: { row: number; col: number } | null = null;
+    if (e.key in moves) {
+      const [dr, dc] = moves[e.key]!;
+      next = {
+        row: Math.min(Math.max(focus.row + dr, 0), days.length - 1),
+        col: Math.min(Math.max(focus.col + dc, 0), tasks.length - 1),
+      };
+    } else if (e.key === "Home") next = { row: focus.row, col: 0 };
+    else if (e.key === "End") next = { row: focus.row, col: tasks.length - 1 };
+    if (!next || !(e.target as HTMLElement).matches("[data-cell]")) return;
+    e.preventDefault();
+    setFocus(next);
+    tableRef.current?.querySelector<HTMLElement>(`[data-cell="${next.row}:${next.col}"]`)?.focus();
+  };
 
   // Jump to a date or habit requested by search.
   React.useEffect(() => {
@@ -201,7 +262,10 @@ export function GridView(props: GridViewProps) {
     setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, ...patch } : t)));
     const res = await updateTask({ taskId: task.id, ...patch });
     if (!res.ok) {
-      setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
+      // Roll back only the fields this patch touched, so a colour change that
+      // succeeded meanwhile is not undone by a rename that failed.
+      const revert = Object.fromEntries(Object.keys(patch).map((k) => [k, task[k as keyof typeof patch]]));
+      setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, ...revert } : t)));
       toast.error(`Couldn't ${label}`, { description: res.error });
     }
   };
@@ -245,12 +309,14 @@ export function GridView(props: GridViewProps) {
     if (before && before.map((t) => t.id).join() !== tasks.map((t) => t.id).join()) void persistOrder(tasks, before);
   };
 
+  const restoreRow = (task: TaskDTO) =>
+    setTasks((prev) => (prev.some((t) => t.id === task.id) ? prev : [...prev, task].sort((a, b) => a.order - b.order)));
+
   const archiveTask = async (task: TaskDTO) => {
-    const previous = tasks;
     setTasks((prev) => prev.filter((t) => t.id !== task.id));
     const res = await updateTask({ taskId: task.id, archived: true });
     if (!res.ok) {
-      setTasks(previous);
+      restoreRow(task);
       toast.error("Couldn't archive the habit", { description: res.error });
       return;
     }
@@ -274,11 +340,10 @@ export function GridView(props: GridViewProps) {
     const task = toDelete;
     setToDelete(null);
     if (!task) return;
-    const previous = tasks;
     setTasks((prev) => prev.filter((t) => t.id !== task.id));
     const res = await deleteTask({ taskId: task.id });
     if (!res.ok) {
-      setTasks(previous);
+      restoreRow(task);
       toast.error("Couldn't delete the habit", { description: res.error });
       return;
     }
@@ -317,8 +382,7 @@ export function GridView(props: GridViewProps) {
           summary={summary}
           todayDone={todayDone}
           todayActive={tasks.length}
-          tasks={tasks}
-          statuses={statuses}
+          dayRates={dayRates}
           today={today}
         />
         {tasks.length > 0 && <AddHabit onAdd={addHabit} className="w-full sm:ms-auto sm:w-auto" />}
@@ -335,7 +399,20 @@ export function GridView(props: GridViewProps) {
                 <AddHabit onAdd={addHabit} autoFocus />
                 <div className="flex flex-wrap justify-center gap-2" aria-label="Suggestions">
                   {SUGGESTIONS.map((s) => (
-                    <Button key={s} size="sm" variant="secondary" onClick={() => void addHabit(s)}>
+                    <Button
+                      key={s}
+                      size="sm"
+                      variant="secondary"
+                      disabled={adding}
+                      onClick={async () => {
+                        setAdding(true);
+                        try {
+                          await addHabit(s);
+                        } finally {
+                          setAdding(false);
+                        }
+                      }}
+                    >
                       {s}
                     </Button>
                   ))}
@@ -358,6 +435,7 @@ export function GridView(props: GridViewProps) {
               aria-label="Habits by day. Rows are days, newest first; columns are habits."
               aria-rowcount={days.length + 1}
               className="w-max border-separate border-spacing-0"
+              onKeyDown={onGridKeyDown}
             >
               <thead>
                 <tr>

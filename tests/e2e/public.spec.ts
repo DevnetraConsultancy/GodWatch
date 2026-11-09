@@ -13,7 +13,7 @@ test.describe("public pages", () => {
 
   test("landing page shows friendly sign-in errors", async ({ page }) => {
     await page.goto("/?error=AccessDenied");
-    await expect(page.getByRole("alert")).toContainText(/verified email/);
+    await expect(page.getByRole("alert").filter({ hasText: /sign-in/i })).toContainText(/verified email/);
   });
 
   test("old login page is gone", async ({ request }) => {

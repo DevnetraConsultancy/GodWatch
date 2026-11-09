@@ -90,6 +90,9 @@ model Task {
   archivedOn String?
   /// Optional per-weekday time windows: { "0".."6" (Sun..Sat): { start: "HH:mm", end: "HH:mm" } }.
   times      Json?
+  /// Days the habit was archived and later restored: [{ from: "yyyy-MM-dd", to: "yyyy-MM-dd" }], `to` exclusive.
+  /// The habit does not count on those days, so restoring it never rescores the gap.
+  pauses     Json?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

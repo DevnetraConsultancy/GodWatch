@@ -2,26 +2,11 @@
 
 import * as React from "react";
 import { Flame, Target, Trophy } from "lucide-react";
-import type { StatusMap, SummaryDTO, TaskDTO } from "@/types/dto";
-import { addDays, formatDate, type ISODate } from "@/lib/dates";
+import type { DayRate, SummaryDTO } from "@/types/dto";
+import { formatDate, type ISODate } from "@/lib/dates";
 
 const BAR_DAYS = 14;
 const HEAT_WEEKS = 12;
-
-/** Share of active habits completed on each of the last `count` days (null = no habit active). */
-function dayRates(tasks: TaskDTO[], statuses: StatusMap, today: ISODate, count: number) {
-  return Array.from({ length: count }, (_, i) => {
-    const date = addDays(today, i - (count - 1));
-    let active = 0;
-    let done = 0;
-    for (const t of tasks) {
-      if (t.startDate > date) continue;
-      active += 1;
-      if (statuses[t.id]?.[date] === "COMPLETED") done += 1;
-    }
-    return { date, rate: active > 0 ? done / active : null };
-  });
-}
 
 function ProgressRing({ value }: { value: number }) {
   const r = 17;
@@ -127,22 +112,24 @@ export function SummaryBar({
   summary,
   todayDone,
   todayActive,
-  tasks,
-  statuses,
+  dayRates,
   today,
 }: {
   heading?: React.ReactNode;
   summary: SummaryDTO;
   todayDone: number;
   todayActive: number;
-  tasks: TaskDTO[];
-  statuses: StatusMap;
+  /** Past days come scored from the server; today is overlaid live from the grid. */
+  dayRates: DayRate[];
   today: ISODate;
 }) {
   const rate = todayActive > 0 ? Math.round((todayDone / todayActive) * 100) : 0;
   const series = React.useMemo(
-    () => dayRates(tasks, statuses, today, HEAT_WEEKS * 7),
-    [tasks, statuses, today]
+    () =>
+      dayRates.map((d) =>
+        d.date === today ? { date: d.date, rate: todayActive > 0 ? todayDone / todayActive : null } : d
+      ),
+    [dayRates, today, todayDone, todayActive]
   );
 
   return (

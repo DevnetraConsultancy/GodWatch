@@ -2,6 +2,7 @@ import type { ISODate } from "@/lib/dates";
 import type { StatusValue } from "@/lib/status";
 import type { AchievementIcon } from "@/lib/achievements";
 import type { WeekTimes } from "@/lib/schedule";
+import type { HabitPause } from "@/lib/stats";
 
 /** Shapes passed from the server to client components. */
 
@@ -14,6 +15,14 @@ export interface TaskDTO {
   archivedOn: ISODate | null;
   /** Per-weekday time windows; null when the habit is untimed. */
   times: WeekTimes | null;
+  /** Archive-and-restore gaps the habit does not count on; null when it has none. */
+  pauses: HabitPause[] | null;
+}
+
+/** One day of the dashboard sparkline: share of active habits completed, null when none was active. */
+export interface DayRate {
+  date: ISODate;
+  rate: number | null;
 }
 
 /** `taskId -> date -> status` (PENDING cells are absent). */
